@@ -73,9 +73,7 @@ No internet connection, no dependencies, no setup required. 🌍✨
 This project is part of the **Maat Field Theory of Everything (MFToE)** —  
 a unified ethical-scientific framework connecting **physics, ethics, and consciousness** through the five Maat fields:
 
-\[
-\text{Maat}_{\text{System}} = \frac{(H \cdot B \cdot S \cdot V \cdot R)}{\Delta E}
-\]
+Mₘₐₐₜ = (𝐻 · 𝐵 · 𝐒 · 𝐕 · 𝐑) / ΔE
 
 The Prompt Builder operationalizes this principle for practical AI and governance applications.
 
