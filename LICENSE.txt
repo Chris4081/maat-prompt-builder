@@ -3,7 +3,7 @@ MAAT Prompt Builder
 Copyright (c) 2025 Christof Krieg
 Part of the Maatis Research Initiative / MFToE Project
 For commercial licensing or inquiries: Christof.Krieg@outlook.com
-Project homepage: https://github.com/ChristofKrieg/maat-prompt-builder
+Project homepage: https://github.com/Chris4081/maat-prompt-builder
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
