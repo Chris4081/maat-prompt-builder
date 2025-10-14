@@ -1,0 +1,103 @@
+# -------------------------
+# 🧭 MAAT Project .gitignore
+# For: MFToE / Maatis Research Initiative
+# -------------------------
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+*.egg
+*.log
+*.tmp
+*.bak
+.env
+venv/
+env/
+.venv/
+pip-wheel-metadata/
+.idea/
+*.sqlite3
+
+# --- Streamlit / Cache ---
+.streamlit/
+.streamlit_cache/
+.streamlit_secrets.toml
+
+# --- Jupyter / Notebooks ---
+.ipynb_checkpoints/
+*.ipynb~
+*.nbconvert.ipynb
+
+# --- macOS / Finder ---
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+__MACOSX/
+
+# --- System / OS ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# --- Build & Distribution ---
+build/
+dist/
+*.spec
+*.lock
+*.tar.gz
+*.zip
+
+# --- HTML / Web ---
+node_modules/
+*.map
+*.cache
+*.sass-cache/
+*.swp
+*.lock
+
+# --- Local configs ---
+*.code-workspace
+*.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# --- Docs / Temporary Exports ---
+*.pdf
+*.aux
+*.out
+*.toc
+*.log
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+
+# --- Personal or Cloud ---
+/Users/
+/Volumes/
+/mnt/data/
+/private/
+/Library/Mobile Documents/
+
+# --- Backup ---
+*~
+*.bak
+*.old
+*.orig
+
+# --- MAAT-specific ---
+maat-memory/
+maat-cache/
+maat_logs/
+maat-testdata/
+secret_keys.json
+config_local.yaml
+
+# --- Optional HTML outputs ---
+index_local.html
+*.html.bak
+*.html~
