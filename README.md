@@ -54,7 +54,7 @@ Extended for Ψ (consciousness) and reflection scoring.
 
 Simply download or clone the repository:
 ```bash
-git clone https://github.com/ChristofKrieg/maat-prompt-builder.git
+git clone https://github.com/Chris4081/maat-prompt-builder.git
 cd maat-prompt-builder
 ```
 
