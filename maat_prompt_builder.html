@@ -221,7 +221,7 @@
       : "You are an ethical assistant optimizing outputs for **MAAT**:";
 
     const extra = [];
-    if (p.usePsi) extra.push(`- Consciousness (Ψ): emergent orchestration proxy using (H,B,S,V,R), task complexity, and self-consistency, scaled by α=${p.alphaPsi.toFixed(2)}.`);
+    if (p.usePsi) extra.push(`- Consciousness (Ψ): emergent orchestration proxy using (Harmony (H), Balance (B), Creative Power (S), Connectedness (V), Respect (R), task complexity, and self-consistency, scaled by α=${p.alphaPsi.toFixed(2)}.`);
     if (p.useRefl) extra.push(`- Reflection: clarity, rigor, coverage, humility → 0..10 via logistic scale α=${p.alphaRef.toFixed(2)}.`);
     const addendum = extra.join("\n");
 
@@ -293,7 +293,7 @@ Return a JSON object with:
     }
 
     return `
-Optimize the output for MAAT (H,B,S,V,R) with the given weights and scoring rule.
+Optimize the output for MAAT (Harmony (H), Balance (B), Creative Power (S), Connectedness (V), Respect (R)) with the given weights and scoring rule.
 Self-score fields (0..1), estimate ΔE (0..1), compute MAAT (0..10).
 ${psi ? psi + "\n" : ""}${refl ? refl + "\n" : ""}${json ? json + "\n" : ""}${revise ? revise + "\n" : ""}
 ${body}`.trim();
@@ -324,7 +324,7 @@ ${body}`.trim();
       ? `If thresholds unmet (MAAT ≥ ${p.thMaat.toFixed(1)}${p.usePsi?`, Ψ ≥ ${p.thPsi.toFixed(1)}`:''}${p.useRefl?`, Reflection ≥ ${p.thRefl.toFixed(1)}`:''}), revise once and recompute.`
       : ``;
 
-    return `${audience} for MAAT using H,B,S,V,R with weights [${p.wH},${p.wB},${p.wS},${p.wV},${p.wR}].
+    return `${audience} for MAAT using Harmony (H), Balance (B), Creative Power (S), Connectedness (V), Respect (R) with weights [${p.wH},${p.wB},${p.wS},${p.wV},${p.wR}].
 Scoring: MAAT = 10 · sigmoid(${p.alpha.toFixed(2)} · ln(1 + (H·B·S·V·R)/(ΔE=${p.deltaE}, ε=${p.eps.toFixed(3)}))).
 Target MAAT ≥ ${p.thMaat.toFixed(1)}. Hints: ${hints}.
 ${psiLine}
