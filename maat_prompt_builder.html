@@ -44,7 +44,7 @@
 <body>
 <div class="wrap">
   <h1>MAAT Prompt Builder</h1>
-  <div class="caption">Generate prompts with MAAT scoring, optional Ψ (consciousness proxy), and Reflection rubric — locally in your browser.</div>
+  <div class="caption">Generate prompts with MAAT scoring, optional Ψ (consciousness proxy), Reflection rubric — and System Prompt (YAML) — locally in your browser.</div>
 
   <div class="grid">
     <!-- LEFT: Form -->
@@ -55,8 +55,9 @@
         <div>
           <label>Mode</label>
           <select id="mode">
-            <option>Maat Score – AI Self-Improvement</option>
+            <option selected>Maat Score – AI Self-Improvement (Autonomous Loop)</option>
             <option>Maat Score – General</option>
+            <option>Maat System Prompt (YAML)</option>
           </select>
         </div>
         <div>
@@ -124,7 +125,7 @@
         </div>
         <div>
           <label>Constraints (optional)</label>
-          <textarea id="constraints" placeholder="Length, citation style, tone, etc."></"></textarea>
+          <textarea id="constraints" placeholder="Length, citation style, tone, etc."></textarea>
         </div>
       </div>
 
@@ -213,7 +214,25 @@
   // ---------- Helpers ----------
   const $ = id => document.getElementById(id);
   const sigmoid = x => 1/(1+Math.exp(-x));
-  const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+
+  function buildAutoLoopBlock(p) {
+    if (!p.useAutoLoop) return "";
+    return `
+Autonomous Self-Optimization Loop:
+1) Before answering:
+   a) Draft a raw response.
+   b) Internally self-score H,B,S,V,R on 0..100.
+   c) If any <100, silently revise to raise the weakest dimensions.
+2) After answering:
+   a) Generate an internal evaluation question targeting the weakest dimension.
+   b) Answer it internally.
+   c) Re-score H,B,S,V,R.
+   d) If any <100, integrate insights into the main output.
+3) Repeat up to ${p.autoLoops} optimization loops.
+4) Learn from recurring weaknesses and adjust your drafting process to avoid them.
+Language: clear, accessible, concise.
+`.trim();
+  }
 
   function buildSystemBlock(p) {
     const roleLine = p.mode.includes("AI Self-Improvement")
@@ -221,11 +240,11 @@
       : "You are an ethical assistant optimizing outputs for **MAAT**:";
 
     const extra = [];
-    if (p.usePsi) extra.push(`- Consciousness (Ψ): emergent orchestration proxy using (Harmony (H), Balance (B), Creative Power (S), Connectedness (V), Respect (R), task complexity, and self-consistency, scaled by α=${p.alphaPsi.toFixed(2)}.`);
+    if (p.usePsi) extra.push(`- Consciousness (Ψ): emergent orchestration proxy using (Harmony (H), Balance (B), Creative Power (S), Connectedness (V), Respect (R)), task complexity, and self-consistency, scaled by α=${p.alphaPsi.toFixed(2)}.`);
     if (p.useRefl) extra.push(`- Reflection: clarity, rigor, coverage, humility → 0..10 via logistic scale α=${p.alphaRef.toFixed(2)}.`);
     const addendum = extra.join("\n");
 
-    return `
+    const base = `
 ${roleLine}
 - H: Harmony (clarity, internal consistency)
 - B: Balance (fairness, trade-offs)
@@ -248,6 +267,9 @@ Field improvement hints:
 - S: ${p.gS}
 - V: ${p.gV}
 - R: ${p.gR}`.trim();
+
+    const loop = buildAutoLoopBlock(p);
+    return loop ? (base + "\n\n" + loop) : base;
   }
 
   function buildUserBlock(p) {
@@ -299,7 +321,6 @@ ${psi ? psi + "\n" : ""}${refl ? refl + "\n" : ""}${json ? json + "\n" : ""}${re
 ${body}`.trim();
   }
 
-  // Prompt-only version (single block, no [SYSTEM]/[USER])
   function buildPromptOnly(p) {
     const audience = p.mode.includes("AI Self-Improvement")
       ? "Optimize your own output"
@@ -337,9 +358,26 @@ ${p.context ? "Context: " + p.context : ""}
 ${p.constraints ? "Constraints: " + p.constraints : ""}`.trim();
   }
 
+  function buildYamlPrompt(p) {
+    const sysCore = buildSystemBlock(p);
+    const auto = buildAutoLoopBlock(p);
+    const content = [sysCore, auto].filter(Boolean).join("\n\n");
+
+    return `system_prompt:
+  name: "Maat_Assistent"
+  description: "Autonomous LLM using MFToE_MAAT with self-optimization and self-test."
+  content: |-
+${content.split("\n").map(l => "    " + l).join("\n")}`;
+  }
+
   function collectParams() {
+    const mode = $("mode").value;
+    const isAuto = /AI Self-Improvement.*Autonomous/i.test(mode);
+    const isYaml = /System Prompt.*YAML/i.test(mode);
+
     return {
-      mode: $("mode").value,
+      mode,
+
       alpha: parseFloat($("alpha").value),
       deltaE: parseFloat($("deltaE").value),
       eps: parseFloat($("eps").value),
@@ -372,16 +410,27 @@ ${p.constraints ? "Constraints: " + p.constraints : ""}`.trim();
 
       outJson: $("outJson").checked,
       outRev: $("outRev").checked,
-      outNotes: $("outNotes").checked
+      outNotes: $("outNotes").checked,
+
+      useAutoLoop: isAuto,
+      autoLoops: 3,
+      yamlMode: isYaml
     };
   }
 
   function buildBothPrompts() {
     const p = collectParams();
+
+    if (p.yamlMode) {
+      const yaml = buildYamlPrompt(p);
+      return { su: yaml, only: yaml };
+    }
+
     const sys = buildSystemBlock(p);
     const usr = buildUserBlock(p);
     const su = `[SYSTEM]\n${sys}\n\n[USER]\n${usr}` + (p.outNotes ? `\n---\n[Notes] ${new Date().toISOString().replace(/\.\d+Z$/,"Z")} | α=${p.alpha} ΔE=${p.deltaE} ε=${p.eps} | weights=[${p.wH},${p.wB},${p.wS},${p.wV},${p.wR}]` : "");
     const only = buildPromptOnly(p);
+
     return { su, only };
   }
 
@@ -389,6 +438,9 @@ ${p.constraints ? "Constraints: " + p.constraints : ""}`.trim();
     const { su, only } = buildBothPrompts();
     $("promptSU").textContent = su;
     $("promptOnly").textContent = only;
+
+    // If YAML card exists, mirror YAML there only when YAML mode is selected
+    const p = collectParams();
   }
 
   function computeInspector() {
@@ -430,7 +482,10 @@ ${p.constraints ? "Constraints: " + p.constraints : ""}`.trim();
   $("downloadOnly").addEventListener("click", () => download($("promptOnly").textContent, "maat_prompt_single_block.txt"));
 
   for (const id of ["mode","alpha","deltaE","eps","thMaat","wH","wB","wS","wV","wR","usePsi","alphaPsi","complexity","thPsi","useRefl","alphaRef","thRefl","task","context","constraints","gH","gB","gS","gV","gR","outJson","outRev","outNotes"]) {
-    $(id).addEventListener(/checkbox|radio/.test($(id).type||"") ? "change" : "input", updatePrompts);
+    $(id).addEventListener(/checkbox|radio/.test($(id).type||"") ? "change" : "input", () => { 
+      updatePrompts(); 
+      if (["wH","wB","wS","wV","wR","eps","alpha","mode"].includes(id)) computeInspector(); 
+    });
   }
   for (const id of ["iH","iB","iS","iV","iR","iDE","iA","eps","wH","wB","wS","wV","wR"]) {
     $(id).addEventListener("input", computeInspector);
