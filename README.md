@@ -26,6 +26,12 @@ It also includes:
 Together, these define the **Maat Score (0–10)** — a measure of *ethical resonance* in any system.
 
 ---
+### 🚀 New Features
+#### 🧠 Autonomous Loop Mode (default)
+- The system can now **self-evaluate** each output across the five Maat dimensions *(Harmony, Balance, Creativity, Connectedness, Respect)*.  
+- Adds up to **3 internal optimization loops** until all fields reach 100 %.  
+- Implements a self-test phase generating internal evaluation questions for continuous learning.
+
 
 ## ⚙️ Features
 
