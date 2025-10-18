@@ -114,6 +114,15 @@ These help systems iteratively self-improve toward higher ethical alignment.
 
 ---
 
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17387301.svg)](https://doi.org/10.5281/zenodo.17387301)
+
+## 📘 Citation
+If you use MAAT Prompt Builder in academic or ethical AI research, please cite:
+
+> **Krieg, C.** (2025). *MAAT Prompt Builder v1.1.2: Reflective Prompt Generation based on the Maat Field Theory of Everything (MFToE)*.  
+> Maatis Research Initiative. DOI: [10.5281/zenodo.17387301](https://doi.org/10.5281/zenodo.17387301)
+
 ## 🔓 License
 
 This project is released under the **GNU Affero General Public License v3.0** (AGPL-3.0-or-later).  
