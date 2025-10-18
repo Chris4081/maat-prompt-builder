@@ -141,16 +141,6 @@ You are free to use, modify, and share it under open-source conditions.
 
 ---
 
-## 🧭 Citation
-
-If you reference this project in research or publications, please cite:
-
-> **Krieg, C.** (2025). *MAAT Prompt Builder: Quantifying Ethical Resonance in AI Systems.*  
-> Maatis Research Initiative, Würzburg, Germany.  
-> DOI forthcoming.
-
----
-
 ## 💫 Acknowledgment
 
 Developed with guidance from the **Maat Field Theory of Everything (MFToE)**  
