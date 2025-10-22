@@ -6,6 +6,7 @@ Created by **Christof Krieg** — Maatis Research Initiative, Würzburg, Germany
 
 ---
 
+
 ## ✨ Overview
 
 The **MAAT Prompt Builder** is a standalone HTML application for generating **AI and system prompts** optimized according to the **five Maat principles**:
@@ -27,11 +28,36 @@ Together, these define the **Maat Score (0–10)** — a measure of *ethical res
 
 ---
 ### 🚀 New Features
-#### 🧠 Autonomous Loop Mode (default)
-- The system can now **self-evaluate** each output across the five Maat dimensions *(Harmony, Balance, Creativity, Connectedness, Respect)*.  
-- Adds up to **3 internal optimization loops** until all fields reach 100 %.  
-- Implements a self-test phase generating internal evaluation questions for continuous learning.
 
+### 🔹 1. Autonomous MAAT Mode
+Self-optimizing AI prompt generator that evaluates its own **Harmony, Balance, Creativity, Connectedness, and Respect** values, refining internally until all reach 100%.
+
+### 🔹 2. MAAT–ESG Ethical Impact Evaluator
+Blend ethical principles with sustainability metrics:
+- MAAT & ESG dual scoring system  
+- Real-time calculation of **Ethical Impact = β · MAAT + (1–β) · ESG**
+- Dynamic visual indicators and JSON export  
+- One-click LLM prompt generator with contextual values  
+- DOI reference embedded for scientific citation
+
+### 🔹 3. MAAT Value Trainer
+Interactive learning mode explaining each MAAT principle and how to apply it to texts, organizations, and projects.
+
+### 🔹 4. PLP Analyzer
+Evaluates responses based on the **Problem–Logic–Potential (PLP) Formula**, factoring cognitive power, obstacles, and energy cost.
+
+### 🔹 5. Holistic Thinking Simulator
+Teaches integrative AI ethics and systems thinking using guided prompts across domains: governance, medicine, smart cities, and creativity.
+
+### 🔹 6. MAAT Creativity Index (MCI)
+Quantifies creative innovation in AI using:  
+`MCI = (H·B·S·V·R) / (1 + E)`  
+where *E* = entropy or unpredictability of generated outputs.
+
+### 🔹 8. Modular Frame System
+Each mode runs in its own HTML frame (`/frames/`) and can be extended easily by adding new evaluators or theoretical models.
+
+---
 
 ## ⚙️ Features
 
