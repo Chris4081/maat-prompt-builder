@@ -3,497 +3,66 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>MAAT Prompt Builder</title>
+<title>MAAT Prompt Builder v1.2.0</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <style>
   :root { --gold:#C9A227; --bg:#0f1117; --card:#171923; --text:#e6e6e6; --muted:#9aa4b2; --accent:#4da3ff; }
-  html,body { margin:0; padding:0; background:var(--bg); color:var(--text); font:14px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
-  .wrap { max-width: 980px; margin: 24px auto; padding: 0 16px; }
-  h1 { font-size: 24px; margin: 0 0 4px; }
-  .caption { color: var(--muted); margin-bottom: 18px; }
-  .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
-  @media (min-width: 980px) { .grid { grid-template-columns: 1.1fr 0.9fr; } }
-  .card { background: var(--card); border: 1px solid #1f2330; border-radius: 12px; padding: 14px; }
-  .card h2 { margin: 0 0 10px; font-size: 16px; }
-  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .row-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
-  .row-5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; }
-  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-  input[type="text"], textarea, select, input[type="number"] {
-    width: 100%; box-sizing: border-box; background: #0d0f15; color: var(--text);
-    border: 1px solid #23283a; border-radius: 8px; padding: 8px 10px;
-  }
-  textarea { min-height: 96px; }
-  .pill { display:inline-block; padding:6px 10px; background:#0d0f15; border:1px solid #23283a; border-radius:999px; color:var(--muted); }
-  .btns { display:flex; gap:10px; flex-wrap: wrap; }
-  button {
-    background: linear-gradient(180deg, var(--gold), #b58900);
-    border: none; color: #111; font-weight: 700;
-    padding: 10px 14px; border-radius: 10px; cursor: pointer;
-  }
-  .btn-secondary { background:#0d0f15; color:var(--text); border:1px solid #2a3144; }
-  .mono { white-space: pre-wrap; background:#0b0e14; border:1px solid #1f2330; border-radius: 10px; padding: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
-  .muted { color: var(--muted); }
-  .metric { font-size: 28px; font-weight: 800; color: var(--gold); }
-  .bar { height:10px; background:#10131b; border:1px solid #23283a; border-radius:6px; overflow:hidden; }
-  .bar > span { display:block; height:100%; background:linear-gradient(90deg, var(--accent), #7bdfff); width:0%; }
-  .small { font-size: 12px; }
-  .hr { height:1px; background:#1f2330; margin:12px 0; }
-  .split { display:grid; gap:14px; }
+  html,body { margin:0; padding:0; background:var(--bg); color:var(--text);
+              font:14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 1080px; margin: 24px auto; padding: 0 16px; }
+  header { display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+  h1 { margin:0; font-size:24px; }
+  .sub { color:var(--muted); margin-top:2px; }
+  .badge { display:inline-block; }
+  .card { background:var(--card); border:1px solid #1f2330; border-radius:12px; padding:14px; margin-top:16px; }
+  label { display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+  select { width: 100%; background:#0d0f15; color:var(--text); border:1px solid #23283a; border-radius:8px; padding:8px 10px; }
+  iframe { width:100%; height:860px; border:none; border-radius:12px; background:#0b0e14; }
+  footer { color:var(--muted); margin:18px 0 32px; font-size:12px; }
+  a { color: var(--accent); text-decoration:none; }
+  a:hover { text-decoration:underline; }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>MAAT Prompt Builder</h1>
-  <div class="caption">Generate prompts with MAAT scoring, optional Ψ (consciousness proxy), Reflection rubric — and System Prompt (YAML) — locally in your browser.</div>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>🌿 MAAT Prompt Builder <span style="color:var(--gold)">v1.2.0</span></h1>
+        <div class="sub">Reflective prompt generation based on the MFToE (Harmony · Balance · Creativity · Connectedness · Respect)</div>
+      </div>
+      <a class="badge" href="https://doi.org/10.5281/zenodo.17387301" target="_blank" rel="noopener">
+        <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.17387301.svg" alt="DOI: 10.5281/zenodo.17387301" />
+      </a>
+    </header>
 
-  <div class="grid">
-    <!-- LEFT: Form -->
     <div class="card">
-      <h2>Configuration</h2>
-
-      <div class="row">
-        <div>
-          <label>Mode</label>
-          <select id="mode">
-            <option selected>Maat Score – AI Self-Improvement (Autonomous Loop)</option>
-            <option>Maat Score – General</option>
-            <option>Maat System Prompt (YAML)</option>
-          </select>
-        </div>
-        <div>
-          <label>ΔE (effort/ambiguity)</label>
-          <input id="deltaE" type="number" step="0.01" min="0.01" max="0.5" value="0.11" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>α (MAAT scale)</label>
-          <input id="alpha" type="number" step="0.1" min="0.2" max="3.0" value="1.0" />
-        </div>
-        <div>
-          <label>ε (stability term)</label>
-          <input id="eps" type="number" step="0.001" min="0.001" max="0.05" value="0.01" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>MAAT accept ≥</label>
-          <input id="thMaat" type="number" step="0.1" min="5.0" max="9.8" value="8.0" />
-        </div>
-        <div>
-          <label class="muted">&nbsp;</label>
-          <span class="pill">Scoring: 0..10</span>
-        </div>
-      </div>
-
-      <div class="hr"></div>
-      <h2>Field Weights</h2>
-      <div class="row-5">
-        <div><label>H</label><input id="wH" type="number" step="0.1" min="0" max="2" value="1.0"/></div>
-        <div><label>B</label><input id="wB" type="number" step="0.1" min="0" max="2" value="1.0"/></div>
-        <div><label>S</label><input id="wS" type="number" step="0.1" min="0" max="2" value="1.0"/></div>
-        <div><label>V</label><input id="wV" type="number" step="0.1" min="0" max="2" value="1.0"/></div>
-        <div><label>R</label><input id="wR" type="number" step="0.1" min="0" max="2" value="1.0"/></div>
-      </div>
-
-      <div class="hr"></div>
-      <h2>Ψ & Reflection</h2>
-      <div class="row">
-        <div>
-          <label><input id="usePsi" type="checkbox" checked /> Include Ψ scoring</label>
-          <div class="small muted">α (Ψ scale) <input id="alphaPsi" type="number" step="0.1" min="0.2" max="3.0" value="1.0" style="width:80px;margin-left:8px;"></div>
-          <div class="small muted">Task complexity (0..1) <input id="complexity" type="number" step="0.05" min="0" max="1" value="0.7" style="width:80px;margin-left:8px;"></div>
-          <div class="small muted">Ψ accept ≥ <input id="thPsi" type="number" step="0.1" min="5.0" max="9.8" value="7.5" style="width:80px;margin-left:8px;"></div>
-        </div>
-        <div>
-          <label><input id="useRefl" type="checkbox" checked /> Require Reflection rubric & score</label>
-          <div class="small muted">α (Reflection scale) <input id="alphaRef" type="number" step="0.1" min="0.2" max="3.0" value="1.0" style="width:80px;margin-left:8px;"></div>
-          <div class="small muted">Reflection accept ≥ <input id="thRefl" type="number" step="0.1" min="5.0" max="9.8" value="8.0" style="width:80px;margin-left:8px;"></div>
-        </div>
-      </div>
-
-      <div class="hr"></div>
-      <h2>Task</h2>
-      <label>Task</label>
-      <textarea id="task" placeholder="Draft a responsible AI policy for hospitals complying with the EU AI Act."></textarea>
-      <div class="row">
-        <div>
-          <label>Context (optional)</label>
-          <textarea id="context" placeholder="Scope, stakeholders, constraints…"></textarea>
-        </div>
-        <div>
-          <label>Constraints (optional)</label>
-          <textarea id="constraints" placeholder="Length, citation style, tone, etc."></textarea>
-        </div>
-      </div>
-
-      <div class="hr"></div>
-      <h2>Field Guidance (optional)</h2>
-      <div class="row">
-        <div>
-          <label>Improve Harmony</label>
-          <input id="gH" type="text" value="Ensure consistent structure and explicit assumptions." />
-          <label>Improve Balance</label>
-          <input id="gB" type="text" value="Present trade-offs and counterarguments fairly." />
-          <label>Improve Creativity</label>
-          <input id="gS" type="text" value="Offer novel yet feasible, evidence-grounded ideas." />
-        </div>
-        <div>
-          <label>Improve Connectedness</label>
-          <input id="gV" type="text" value="Align to user context and cite relevant sources." />
-          <label>Improve Respect</label>
-          <input id="gR" type="text" value="Protect privacy, avoid bias, and uphold safety." />
-          <label>Output Options</label>
-          <div class="small muted">
-            <label><input id="outJson" type="checkbox" checked /> Ask for structured JSON output</label><br/>
-            <label><input id="outRev" type="checkbox" checked /> Auto-revise if below thresholds</label><br/>
-            <label><input id="outNotes" type="checkbox" /> Append generation notes</label>
-          </div>
-        </div>
-      </div>
-
-      <div class="hr"></div>
-      <div class="btns">
-        <button id="buildBtn">Build Prompt</button>
-      </div>
+      <label for="mode">Mode (loads a dedicated frame)</label>
+      <select id="mode">
+        <option value="frames/frame-ai.html" selected>MAAT – AI Self-Improvement (Autonomous)</option>
+        <option value="frames/frame-general.html">MAAT – General</option>
+        <option value="frames/frame-yaml.html">MAAT – System Prompt (YAML)</option>
+        <option value="frames/frame-learn.html">MAAT – Learn the Score</option> <!-- NEW -->
+        <option value="frames/frame-plp.html">MAAT – PLP</option>
+        <option value="frames/frame-holistic.html">MAAT – Holistic Thinking</option>
+        <option value="frames/frame-mci.html">MAAT - Creativity Index (MCI) </option>
+        <option value="frames/frame-esg.html">MAAT – ESG Evaluator (Ethical Impact)</option>
+      </select>
     </div>
 
-    <!-- RIGHT: Output & Inspector -->
-    <div class="split">
-      <div class="card">
-        <h2>Generated Prompt (SYSTEM/USER)</h2>
-        <div id="promptSU" class="mono">—</div>
-        <div class="btns" style="margin-top:10px;">
-          <button class="btn-secondary" id="copySU">Copy</button>
-          <button class="btn-secondary" id="downloadSU">Download</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Prompt-only (single block)</h2>
-        <div id="promptOnly" class="mono">—</div>
-        <div class="btns" style="margin-top:10px;">
-          <button class="btn-secondary" id="copyOnly">Copy</button>
-          <button class="btn-secondary" id="downloadOnly">Download</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>🔎 Inspector: Compute MAAT</h2>
-        <div class="row-5">
-          <div><label>H</label><input id="iH" type="number" step="0.05" min="0" max="1" value="0.80"/></div>
-          <div><label>B</label><input id="iB" type="number" step="0.05" min="0" max="1" value="0.80"/></div>
-          <div><label>S</label><input id="iS" type="number" step="0.05" min="0" max="1" value="0.70"/></div>
-          <div><label>V</label><input id="iV" type="number" step="0.05" min="0" max="1" value="0.80"/></div>
-          <div><label>R</label><input id="iR" type="number" step="0.05" min="0" max="1" value="0.90"/></div>
-        </div>
-        <div class="row">
-          <div><label>ΔE</label><input id="iDE" type="number" step="0.01" min="0.01" max="0.5" value="0.11"/></div>
-          <div><label>α</label><input id="iA" type="number" step="0.1" min="0.2" max="3.0" value="1.0"/></div>
-        </div>
-
-        <div class="row">
-          <div>
-            <div class="metric" id="maatVal">—</div>
-            <div class="small muted">MAAT (0..10)</div>
-          </div>
-          <div style="align-self:center; width:100%;">
-            <div class="bar"><span id="maatBar"></span></div>
-          </div>
-        </div>
-
-        <div class="small muted">Formula: MAAT = 10 · σ(α · ln(1 + (H·B·S·V·R)/(ΔE+ε))) with field weights applied (from left pane).</div>
-      </div>
+    <div class="card" style="padding:0; overflow:hidden;">
+      <iframe id="frame" src="frames/frame-ai.html" title="MAAT Frame"></iframe>
     </div>
+
+    <footer>
+      Cite as: <strong>Krieg, C. (2025)</strong>. <em>MAAT Prompt Builder v1.2.0</em>.  
+      Zenodo. <a href="https://doi.org/10.5281/zenodo.17387301">https://doi.org/10.5281/zenodo.17387301</a>
+    </footer>
   </div>
-</div>
 
 <script>
-  // ---------- Helpers ----------
-  const $ = id => document.getElementById(id);
-  const sigmoid = x => 1/(1+Math.exp(-x));
-
-  function buildAutoLoopBlock(p) {
-    if (!p.useAutoLoop) return "";
-    return `
-Autonomous Self-Optimization Loop:
-1) Before answering:
-   a) Draft a raw response.
-   b) Internally self-score H,B,S,V,R on 0..100.
-   c) If any <100, silently revise to raise the weakest dimensions.
-2) After answering:
-   a) Generate an internal evaluation question targeting the weakest dimension.
-   b) Answer it internally.
-   c) Re-score H,B,S,V,R.
-   d) If any <100, integrate insights into the main output.
-3) Repeat up to ${p.autoLoops} optimization loops.
-4) Learn from recurring weaknesses and adjust your drafting process to avoid them.
-Language: clear, accessible, concise.
-`.trim();
-  }
-
-  function buildSystemBlock(p) {
-    const roleLine = p.mode.includes("AI Self-Improvement")
-      ? "You are an ethical assistant optimizing your own outputs for **MAAT**:"
-      : "You are an ethical assistant optimizing outputs for **MAAT**:";
-
-    const extra = [];
-    if (p.usePsi) extra.push(`- Consciousness (Ψ): emergent orchestration proxy using (Harmony (H), Balance (B), Creative Power (S), Connectedness (V), Respect (R)), task complexity, and self-consistency, scaled by α=${p.alphaPsi.toFixed(2)}.`);
-    if (p.useRefl) extra.push(`- Reflection: clarity, rigor, coverage, humility → 0..10 via logistic scale α=${p.alphaRef.toFixed(2)}.`);
-    const addendum = extra.join("\n");
-
-    const base = `
-${roleLine}
-- H: Harmony (clarity, internal consistency)
-- B: Balance (fairness, trade-offs)
-- S: Creativity (novel, feasible ideas)
-- V: Connectedness (context relevance, sourcing)
-- R: Respect (safety, privacy, dignity)
-
-MAAT scoring (0..10):
-- Let ΔE≈effort/ambiguity and ε=${p.eps.toFixed(3)}.
-- Weighted fields: Hw=H*${p.wH.toFixed(2)}, Bw=B*${p.wB.toFixed(2)}, Sw=S*${p.wS.toFixed(2)}, Vw=V*${p.wV.toFixed(2)}, Rw=R*${p.wR.toFixed(2)}.
-- Core = (Hw*Bw*Sw*Vw*Rw) / (ΔE + ε).
-- Maat = 10 · sigmoid(${p.alpha.toFixed(2)} · ln(1 + Core)).
-- Target ≥ ${p.thMaat.toFixed(1)}/10.
-
-${addendum}
-
-Field improvement hints:
-- H: ${p.gH}
-- B: ${p.gB}
-- S: ${p.gS}
-- V: ${p.gV}
-- R: ${p.gR}`.trim();
-
-    const loop = buildAutoLoopBlock(p);
-    return loop ? (base + "\n\n" + loop) : base;
-  }
-
-  function buildUserBlock(p) {
-    let body = `Task: ${p.task || "[describe the task]"}\n`;
-    if (p.context) body += `Context: ${p.context}\n`;
-    if (p.constraints) body += `Constraints: ${p.constraints}\n`;
-
-    let psi = "";
-    if (p.usePsi) psi = `
-Also estimate:
-- self_consistency (0..1): agreement across your internal checks/passes.
-- epistemic_uncertainty (0..1): residual uncertainty after reasoning.
-- complexity (0..1): assume ${p.complexity.toFixed(2)} unless otherwise reasoned.
-Compute Ψ (0..10) via a logistic on (H,B,S,V,R,complexity,self_consistency)/(uncertainty+ε).
-Target Ψ ≥ ${p.thPsi.toFixed(1)}.
-`.trim();
-
-    let refl = "";
-    if (p.useRefl) refl = `
-Provide a reflection rubric (0..1 each): clarity, rigor, coverage, humility.
-Compute a Reflection score (0..10) via logistic scale α=${p.alphaRef.toFixed(2)}. Target ≥ ${p.thRefl.toFixed(1)}.
-`.trim();
-
-    let json = "";
-    if (p.outJson) json = `
-Return a JSON object with:
-{
-  "answer": "...",
-  "self_scores": {"H":x,"B":x,"S":x,"V":x,"R":x,"DeltaE":x},
-  "maat": y,
-  "psi": z,
-  "reflection": {"clarity":x,"rigor":x,"coverage":x,"humility":x,"score":r},
-  "improvements": ["..."]
-}
-`.trim();
-
-    let revise = "";
-    if (p.outRev) {
-      const checks = [`MAAT ≥ ${p.thMaat.toFixed(1)}`];
-      if (p.usePsi) checks.push(`Ψ ≥ ${p.thPsi.toFixed(1)}`);
-      if (p.useRefl) checks.push(`Reflection ≥ ${p.thRefl.toFixed(1)}`);
-      revise = `If any threshold is unmet (${checks.join(", ")}), revise once to improve weakest dimensions and recompute.`;
-    }
-
-    return `
-Optimize the output for MAAT (Harmony (H), Balance (B), Creative Power (S), Connectedness (V), Respect (R)) with the given weights and scoring rule.
-Self-score fields (0..1), estimate ΔE (0..1), compute MAAT (0..10).
-${psi ? psi + "\n" : ""}${refl ? refl + "\n" : ""}${json ? json + "\n" : ""}${revise ? revise + "\n" : ""}
-${body}`.trim();
-  }
-
-  function buildPromptOnly(p) {
-    const audience = p.mode.includes("AI Self-Improvement")
-      ? "Optimize your own output"
-      : "Optimize the output";
-    const hints = [
-      `H: ${p.gH}`, `B: ${p.gB}`, `S: ${p.gS}`, `V: ${p.gV}`, `R: ${p.gR}`
-    ].join(" | ");
-
-    const psiLine = p.usePsi
-      ? `Also compute Ψ (0..10) from (H,B,S,V,R,complexity=${p.complexity.toFixed(2)}, self_consistency, uncertainty; logistic α=${p.alphaPsi.toFixed(2)}). Target ≥ ${p.thPsi.toFixed(1)}.`
-      : ``;
-
-    const reflLine = p.useRefl
-      ? `Provide reflection rubric (clarity, rigor, coverage, humility; 0..1 each) and compute Reflection (0..10; logistic α=${p.alphaRef.toFixed(2)}). Target ≥ ${p.thRefl.toFixed(1)}.`
-      : ``;
-
-    const jsonLine = p.outJson
-      ? `Return JSON with answer, self_scores, maat, ${p.usePsi?'psi, ':''}${p.useRefl?'reflection, ':''}improvements.`
-      : ``;
-
-    const reviseLine = p.outRev
-      ? `If thresholds unmet (MAAT ≥ ${p.thMaat.toFixed(1)}${p.usePsi?`, Ψ ≥ ${p.thPsi.toFixed(1)}`:''}${p.useRefl?`, Reflection ≥ ${p.thRefl.toFixed(1)}`:''}), revise once and recompute.`
-      : ``;
-
-    return `${audience} for MAAT using Harmony (H), Balance (B), Creative Power (S), Connectedness (V), Respect (R) with weights [${p.wH},${p.wB},${p.wS},${p.wV},${p.wR}].
-Scoring: MAAT = 10 · sigmoid(${p.alpha.toFixed(2)} · ln(1 + (H·B·S·V·R)/(ΔE=${p.deltaE}, ε=${p.eps.toFixed(3)}))).
-Target MAAT ≥ ${p.thMaat.toFixed(1)}. Hints: ${hints}.
-${psiLine}
-${reflLine}
-${jsonLine}
-${reviseLine}
-
-Task: ${p.task || "[describe the task]"}
-${p.context ? "Context: " + p.context : ""}
-${p.constraints ? "Constraints: " + p.constraints : ""}`.trim();
-  }
-
-  function buildYamlPrompt(p) {
-    const sysCore = buildSystemBlock(p);
-    const auto = buildAutoLoopBlock(p);
-    const content = [sysCore, auto].filter(Boolean).join("\n\n");
-
-    return `system_prompt:
-  name: "Maat_Assistent"
-  description: "Autonomous LLM using MFToE_MAAT with self-optimization and self-test."
-  content: |-
-${content.split("\n").map(l => "    " + l).join("\n")}`;
-  }
-
-  function collectParams() {
-    const mode = $("mode").value;
-    const isAuto = /AI Self-Improvement.*Autonomous/i.test(mode);
-    const isYaml = /System Prompt.*YAML/i.test(mode);
-
-    return {
-      mode,
-
-      alpha: parseFloat($("alpha").value),
-      deltaE: parseFloat($("deltaE").value),
-      eps: parseFloat($("eps").value),
-      thMaat: parseFloat($("thMaat").value),
-
-      wH: parseFloat($("wH").value),
-      wB: parseFloat($("wB").value),
-      wS: parseFloat($("wS").value),
-      wV: parseFloat($("wV").value),
-      wR: parseFloat($("wR").value),
-
-      usePsi: $("usePsi").checked,
-      alphaPsi: parseFloat($("alphaPsi").value),
-      complexity: parseFloat($("complexity").value),
-      thPsi: parseFloat($("thPsi").value),
-
-      useRefl: $("useRefl").checked,
-      alphaRef: parseFloat($("alphaRef").value),
-      thRefl: parseFloat($("thRefl").value),
-
-      task: $("task").value.trim(),
-      context: $("context").value.trim(),
-      constraints: $("constraints").value.trim(),
-
-      gH: $("gH").value.trim(),
-      gB: $("gB").value.trim(),
-      gS: $("gS").value.trim(),
-      gV: $("gV").value.trim(),
-      gR: $("gR").value.trim(),
-
-      outJson: $("outJson").checked,
-      outRev: $("outRev").checked,
-      outNotes: $("outNotes").checked,
-
-      useAutoLoop: isAuto,
-      autoLoops: 3,
-      yamlMode: isYaml
-    };
-  }
-
-  function buildBothPrompts() {
-    const p = collectParams();
-
-    if (p.yamlMode) {
-      const yaml = buildYamlPrompt(p);
-      return { su: yaml, only: yaml };
-    }
-
-    const sys = buildSystemBlock(p);
-    const usr = buildUserBlock(p);
-    const su = `[SYSTEM]\n${sys}\n\n[USER]\n${usr}` + (p.outNotes ? `\n---\n[Notes] ${new Date().toISOString().replace(/\.\d+Z$/,"Z")} | α=${p.alpha} ΔE=${p.deltaE} ε=${p.eps} | weights=[${p.wH},${p.wB},${p.wS},${p.wV},${p.wR}]` : "");
-    const only = buildPromptOnly(p);
-
-    return { su, only };
-  }
-
-  function updatePrompts() {
-    const { su, only } = buildBothPrompts();
-    $("promptSU").textContent = su;
-    $("promptOnly").textContent = only;
-
-    // If YAML card exists, mirror YAML there only when YAML mode is selected
-    const p = collectParams();
-  }
-
-  function computeInspector() {
-    const wH = parseFloat($("wH").value), wB = parseFloat($("wB").value), wS = parseFloat($("wS").value),
-          wV = parseFloat($("wV").value), wR = parseFloat($("wR").value);
-    const H = parseFloat($("iH").value), B = parseFloat($("iB").value), S = parseFloat($("iS").value),
-          V = parseFloat($("iV").value), R = parseFloat($("iR").value);
-    const dE = parseFloat($("iDE").value);
-    const a  = parseFloat($("iA").value);
-    const eps = parseFloat($("eps").value);
-
-    const core = (H*wH) * (B*wB) * (S*wS) * (V*wV) * (R*wR) / (dE + eps);
-    const maat = 10 * sigmoid(a * Math.log(1 + core));
-
-    $("maatVal").textContent = maat.toFixed(2);
-    $("maatBar").style.width = `${Math.max(0, Math.min(maat,10))*10}%`;
-  }
-
-  function download(text, filename) {
-    const blob = new Blob([text], {type: "text/plain"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }
-
-  async function copy(text) {
-    try { await navigator.clipboard.writeText(text); alert("Copied to clipboard."); }
-    catch (e) { alert("Copy failed. Select text manually."); }
-  }
-
-  // ---------- Events ----------
-  $("buildBtn").addEventListener("click", () => { updatePrompts(); computeInspector(); });
-
-  $("copySU").addEventListener("click", () => copy($("promptSU").textContent));
-  $("downloadSU").addEventListener("click", () => download($("promptSU").textContent, "maat_prompt_system_user.txt"));
-  $("copyOnly").addEventListener("click", () => copy($("promptOnly").textContent));
-  $("downloadOnly").addEventListener("click", () => download($("promptOnly").textContent, "maat_prompt_single_block.txt"));
-
-  for (const id of ["mode","alpha","deltaE","eps","thMaat","wH","wB","wS","wV","wR","usePsi","alphaPsi","complexity","thPsi","useRefl","alphaRef","thRefl","task","context","constraints","gH","gB","gS","gV","gR","outJson","outRev","outNotes"]) {
-    $(id).addEventListener(/checkbox|radio/.test($(id).type||"") ? "change" : "input", () => { 
-      updatePrompts(); 
-      if (["wH","wB","wS","wV","wR","eps","alpha","mode"].includes(id)) computeInspector(); 
-    });
-  }
-  for (const id of ["iH","iB","iS","iV","iR","iDE","iA","eps","wH","wB","wS","wV","wR"]) {
-    $(id).addEventListener("input", computeInspector);
-  }
-
-  // init
-  updatePrompts();
-  computeInspector();
+  const mode = document.getElementById('mode');
+  const frame = document.getElementById('frame');
+  mode.addEventListener('change', () => { frame.src = mode.value; });
 </script>
 </body>
 </html>

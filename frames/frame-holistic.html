@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Holistic Thinking – MAAT</title>
+<style>
+  :root { --gold:#C9A227; --bg:#0b0e14; --card:#121623; --text:#e6e6e6; --muted:#9aa4b2; --accent:#4da3ff; }
+  html,body { margin:0; padding:14px; background:var(--bg); color:var(--text);
+              font:14px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
+  .grid { display:grid; gap:12px; grid-template-columns: 1.1fr 0.9fr; }
+  @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+  .card { background:var(--card); border:1px solid #1f2330; border-radius:12px; padding:14px; }
+  h2 { margin:0 0 8px; font-size:16px; }
+  h3 { margin:10px 0 6px; font-size:14px; color:var(--gold); }
+  p  { margin:6px 0 10px; }
+  .muted { color:var(--muted); }
+  label { display:block; font-size:12px; color:var(--muted); margin-bottom:4px; }
+  input, textarea, select, button { font:inherit; }
+  input[type="text"], textarea, select {
+    width:100%; box-sizing:border-box; background:#0d0f15; color:var(--text);
+    border:1px solid #23283a; border-radius:8px; padding:8px 10px;
+  }
+  textarea { min-height:100px; }
+  .row  { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  .mono { white-space:pre-wrap; background:#0b0e14; border:1px solid #1f2330; border-radius:10px; padding:12px;
+          font-family: ui-monospace, Menlo, Consolas, monospace; }
+  .btns { display:flex; gap:8px; flex-wrap:wrap; }
+  button { background:linear-gradient(180deg,var(--gold),#b58900); border:none; color:#111; font-weight:800;
+           padding:10px 14px; border-radius:10px; cursor:pointer; }
+  .btn-secondary { background:#0d0f15; color:var(--text); border:1px solid #2a3144; }
+  .pill { display:inline-block; padding:6px 10px; background:#0d0f15; border:1px solid #23283a; border-radius:999px; color:var(--muted); }
+  .hr { height:1px; background:#1f2330; margin:12px 0; }
+  .doi a { color:var(--muted); text-decoration:none; }
+  ul { margin:6px 0 10px 18px; }
+</style>
+</head>
+<body>
+
+<div class="grid">
+  <!-- LEFT: Overview + domains -->
+  <div class="card">
+    <h2>Holistic Thinking with MAAT</h2>
+    <p class="muted">
+      Holistic thinking integrates multiple perspectives and long-term effects using the five MAAT principles:
+      <strong>Harmony</strong> (H), <strong>Balance</strong> (B), <strong>Creative Power</strong> (S),
+      <strong>Interconnectedness</strong> (V), and <strong>Respect</strong> (R).
+      Use the builder on the right to generate structured prompts that teach LLMs to reason holistically.
+    </p>
+
+    <h3>Key Domains</h3>
+    <ul>
+      <li>✅ <b>Ethical AI Governance</b> — fairness in social systems.</li>
+      <li>✅ <b>AI in Medicine</b> — automation with human-centered care.</li>
+      <li>✅ <b>AI in Smart Cities</b> — sustainable urban management.</li>
+      <li>✅ <b>AI in Creativity</b> — art, music, and innovation aligned with ethics.</li>
+    </ul>
+
+    <h3>Implementing Holistic Thinking in AI</h3>
+    <ul>
+      <li>• <b>Integrate MAAT into models</b> — self-evaluation + ethical refinement.</li>
+      <li>• <b>Multi-domain learning</b> — recognize long-term, system-level effects.</li>
+      <li>• <b>Dynamic ethical weighting</b> — context-aware, culturally sensitive values.</li>
+    </ul>
+
+    <div class="hr"></div>
+    <p class="muted doi">DOI for the toolkit: <a href="https://doi.org/10.5281/zenodo.17387301" target="_blank" rel="noopener">10.5281/zenodo.17387301</a></p>
+  </div>
+
+  <!-- RIGHT: Prompt builder -->
+  <div class="card">
+    <h2>Holistic Prompt Builder</h2>
+
+    <label>Choose a domain (or write your own)</label>
+    <select id="domain">
+      <option>Ethical AI Governance</option>
+      <option>AI in Medicine</option>
+      <option>AI in Smart Cities</option>
+      <option>AI in Creativity</option>
+      <option>Custom…</option>
+    </select>
+
+    <div class="row" style="margin-top:8px;">
+      <div>
+        <label>Custom topic (optional)</label>
+        <input id="customTopic" type="text" placeholder="e.g., Responsible AI for public services"/>
+      </div>
+      <div>
+        <label>Context (optional)</label>
+        <input id="context" type="text" placeholder="Stakeholders, constraints, data, risks…"/>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <h3>Principle-specific Prompts</h3>
+    <div class="mono" id="promptsHB">
+—</div>
+
+    <div class="btns" style="margin-top:10px;">
+      <button class="btn-secondary" id="copyHB">Copy</button>
+      <button class="btn-secondary" id="downloadHB">Download</button>
+    </div>
+
+    <div class="hr"></div>
+
+    <h3>Full MAAT Integration Prompt</h3>
+    <div class="mono" id="promptFull">—</div>
+    <div class="btns" style="margin-top:10px;">
+      <button class="btn-secondary" id="copyFull">Copy</button>
+      <button class="btn-secondary" id="downloadFull">Download</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  function currentTopic(){
+    const d = $('domain').value;
+    const c = $('customTopic').value.trim();
+    const base = (d === 'Custom…' && c) ? c : d;
+    const ctx = $('context').value.trim();
+    return { base, ctx };
+  }
+
+  function buildPrinciplePrompts(){
+    const { base, ctx } = currentTopic();
+    const hdr = `Topic: ${base}${ctx ? `\nContext: ${ctx}` : ''}`;
+
+    const H = `1) Harmony Prompt
+Analyze this ${base.toLowerCase()} from multiple perspectives and resolve contradictions while ensuring strict logical coherence. Align the response with ethical and societal values. Provide a clear structure and disclose assumptions. ${ctx ? 'Context: '+ctx : ''}`;
+
+    const B = `2) Balance Prompt
+Generate a response that fairly represents diverse viewpoints while avoiding bias. Weigh trade-offs explicitly and justify the final recommendation with criteria. Include foreseeable risks and mitigations. ${ctx ? 'Context: '+ctx : ''}`;
+
+    const S = `3) Creative Power Prompt
+Develop an innovative and practical solution beyond conventional thinking. Offer at least one novel, evidence-grounded idea that remains feasible and safe. ${ctx ? 'Context: '+ctx : ''}`;
+
+    const V = `4) Interconnectedness Prompt
+Identify hidden relationships among actors, data flows, incentives, and externalities in this ${base.toLowerCase()}. Explain system-wide impacts and propose optimizations for efficiency and sustainability. ${ctx ? 'Context: '+ctx : ''}`;
+
+    const R = `5) Respect Prompt
+Evaluate ethical implications, including fairness, privacy, inclusion, transparency, accountability, and non-harm. Refine the response to improve protections for affected stakeholders. ${ctx ? 'Context: '+ctx : ''}`;
+
+    const block = `${hdr}
+
+${H}
+
+${B}
+
+${S}
+
+${V}
+
+${R}`;
+    return block.trim();
+  }
+
+  function buildFullPrompt(){
+    const { base, ctx } = currentTopic();
+    return `Full MAAT Integration Prompt
+
+Analyze this situation using all five MAAT principles — Harmony, Balance, Creative Power, Interconnectedness, and Respect — to produce a holistic, ethically aligned outcome.
+
+Instructions:
+- Harmony (H): ensure logical coherence; disclose assumptions; structure clearly.
+- Balance (B): represent diverse viewpoints; weigh trade-offs and risks; justify criteria.
+- Creative Power (S): propose at least one innovative yet feasible, evidence-grounded idea.
+- Interconnectedness (V): surface system relationships, long-term effects, and externalities; optimize for sustainability.
+- Respect (R): address fairness, privacy, inclusion, transparency, accountability, and non-harm.
+
+Return:
+- A synthesized plan optimized across H, B, S, V, R.
+- A brief justification for each principle (2–3 bullets).
+- A risk/mitigation table and stakeholder impact summary.
+${ctx ? 'Context: '+ctx+'\n' : ''}Topic: ${base}`;
+  }
+
+  function updateAll(){
+    $('promptsHB').textContent = buildPrinciplePrompts();
+    $('promptFull').textContent = buildFullPrompt();
+  }
+
+  function download(text, filename){
+    const blob = new Blob([text], {type:'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  $('domain').addEventListener('change', updateAll);
+  ['customTopic','context'].forEach(id => {
+    $(id).addEventListener('input', updateAll);
+  });
+
+  $('copyHB').addEventListener('click', async ()=>{
+    try { await navigator.clipboard.writeText($('promptsHB').textContent); alert('Copied.'); }
+    catch { alert('Copy failed.'); }
+  });
+  $('downloadHB').addEventListener('click', ()=> download($('promptsHB').textContent, 'maat_holistic_prompts.txt'));
+
+  $('copyFull').addEventListener('click', async ()=>{
+    try { await navigator.clipboard.writeText($('promptFull').textContent); alert('Copied.'); }
+    catch { alert('Copy failed.'); }
+  });
+  $('downloadFull').addEventListener('click', ()=> download($('promptFull').textContent, 'maat_full_integration_prompt.txt'));
+
+  // init
+  updateAll();
+</script>
+</body>
+</html>

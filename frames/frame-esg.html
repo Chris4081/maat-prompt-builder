@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MAAT–ESG Evaluator (Ethical Impact)</title>
+<style>
+  :root{--gold:#C9A227;--bg:#0f1117;--card:#171923;--muted:#9aa4b2;--text:#e6e6e6;--line:#23283a;--accent:#4da3ff}
+  html,body{margin:0;background:transparent;color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  .wrap{padding:8px}
+  h2{font-size:16px;margin:8px 0 10px}
+  label{display:block;font-size:12px;color:var(--muted);margin:6px 0 4px}
+  textarea,input[type="number"],input[type="range"]{width:100%;box-sizing:border-box;background:#0d0f15;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+  textarea{min-height:110px}
+  .grid{display:grid;gap:12px}
+  .cols{display:grid;gap:12px;grid-template-columns:1fr}
+  @media(min-width:820px){.cols{grid-template-columns:1fr 1fr}}
+  .card{background:var(--card);border:1px solid #1f2330;border-radius:12px;padding:12px}
+  .row3{display:grid;gap:10px;grid-template-columns:repeat(3,1fr)}
+  .row5{display:grid;gap:10px;grid-template-columns:repeat(5,1fr)}
+  .pill{display:inline-block;padding:5px 9px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:12px}
+  .btns{display:flex;gap:10px;flex-wrap:wrap}
+  button{background:linear-gradient(180deg,var(--gold),#b58900);border:none;color:#111;font-weight:700;padding:9px 12px;border-radius:10px;cursor:pointer}
+  .btn-secondary{background:#0d0f15;color:var(--text);border:1px solid #2a3144}
+  .mono{white-space:pre-wrap;background:#0b0e14;border:1px solid #1f2330;border-radius:10px;padding:10px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .muted{color:var(--muted)}
+  .metric{font-size:26px;font-weight:800;color:var(--gold)}
+  .bar{height:10px;background:#10131b;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .bar>span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7bdfff);width:0%}
+  .hr{height:1px;background:#1f2330;margin:10px 0}
+  .small{font-size:12px}
+  .bad{color:#ff6b6b}.ok{color:#ffd166}.good{color:#7ce38b}
+</style>
+</head>
+<body>
+<div class="wrap grid">
+
+  <!-- PROJECT -->
+  <div class="card">
+    <h2>Project Summary</h2>
+    <label for="summary">Describe the project/policy/organization to evaluate</label>
+    <textarea id="summary" placeholder="Example: City-wide smart grid modernization focusing on renewable integration, data privacy, equitable access, and transparent governance."></textarea>
+  </div>
+
+  <div class="cols">
+    <!-- MAAT -->
+    <div class="card">
+      <h2>MAAT Fields (0–10)</h2>
+      <div class="row5">
+        <div><label>H (Harmony)</label><input id="H" type="number" min="0" max="10" step="0.1" value="8.0"></div>
+        <div><label>B (Balance)</label><input id="B" type="number" min="0" max="10" step="0.1" value="8.0"></div>
+        <div><label>S (Creativity)</label><input id="S" type="number" min="0" max="10" step="0.1" value="7.0"></div>
+        <div><label>V (Connectedness)</label><input id="V" type="number" min="0" max="10" step="0.1" value="8.0"></div>
+        <div><label>R (Respect)</label><input id="R" type="number" min="0" max="10" step="0.1" value="9.0"></div>
+      </div>
+      <div class="hr"></div>
+      <div class="row3">
+        <div>
+          <label>ΔE (effort/ambiguity)</label>
+          <input id="deltaE" type="number" min="0.01" max="0.5" step="0.01" value="0.11">
+        </div>
+        <div>
+          <label>ε (stability)</label>
+          <input id="eps" type="number" min="0.001" max="0.05" step="0.001" value="0.01">
+        </div>
+        <div>
+          <label>α (scale)</label>
+          <input id="alpha" type="number" min="0.2" max="3.0" step="0.1" value="1.0">
+        </div>
+      </div>
+      <div class="small muted">Formula: MAAT = 10 · σ( α · ln( 1 + (h·b·s·v·r) / (ΔE + ε) ) ), with h..r normalized to 0..1.</div>
+    </div>
+
+    <!-- ESG -->
+    <div class="card">
+      <h2>ESG Pillars (0–10)</h2>
+      <div class="row3">
+        <div><label>E (Environment)</label><input id="E" type="number" min="0" max="10" step="0.1" value="8.5"></div>
+        <div><label>S (Social)</label><input id="ES" type="number" min="0" max="10" step="0.1" value="7.8"></div>
+        <div><label>G (Governance)</label><input id="G" type="number" min="0" max="10" step="0.1" value="8.2"></div>
+      </div>
+      <div class="hr"></div>
+      <div class="row3">
+        <div><label>wE</label><input id="wE" type="number" min="0" max="2" step="0.1" value="1.0"></div>
+        <div><label>wS</label><input id="wES" type="number" min="0" max="2" step="0.1" value="1.0"></div>
+        <div><label>wG</label><input id="wG" type="number" min="0" max="2" step="0.1" value="1.0"></div>
+      </div>
+      <div class="small muted">ESG score computed as weighted average of (E,S,G) on 0..10.</div>
+    </div>
+  </div>
+
+  <!-- BLEND + RESULTS -->
+  <div class="card">
+    <h2>Blend & Results</h2>
+    <div class="row3">
+      <div>
+        <label>β (blend MAAT↔ESG)</label>
+        <input id="beta" type="range" min="0" max="1" step="0.05" value="0.6">
+        <div class="small muted">Ethical Impact = β·MAAT + (1–β)·ESG</div>
+      </div>
+      <div style="align-self:end">
+        <div class="metric" id="maatVal">MAAT —</div>
+        <div class="bar"><span id="maatBar"></span></div>
+      </div>
+      <div style="align-self:end">
+        <div class="metric" id="esgVal">ESG —</div>
+        <div class="bar"><span id="esgBar"></span></div>
+      </div>
+    </div>
+
+    <div class="row3" style="margin-top:10px">
+      <div>
+        <div class="metric" id="impactVal">Impact —</div>
+        <div class="bar"><span id="impactBar"></span></div>
+      </div>
+      <div>
+        <label class="muted">Classification</label>
+        <div id="impactClass" class="pill">—</div>
+      </div>
+      <div style="align-self:end">
+        <div class="small muted">DOI: <a href="https://doi.org/10.5281/zenodo.17387301" target="_blank" style="color:#7bdfff">10.5281/zenodo.17387301</a></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JSON -->
+  <div class="card">
+    <h2>Structured Output (JSON)</h2>
+    <div id="jsonOut" class="mono">—</div>
+    <div class="btns" style="margin-top:10px">
+      <button class="btn-secondary" id="copyJson">Copy JSON</button>
+      <button class="btn-secondary" id="downloadJson">Download JSON</button>
+    </div>
+  </div>
+
+  <!-- PROMPT -->
+  <div class="card">
+    <h2>LLM Prompt (MAAT–ESG Ethical Impact)</h2>
+    <div id="promptOut" class="mono">—</div>
+    <div class="btns" style="margin-top:10px">
+      <button class="btn-secondary" id="copyPrompt">Copy Prompt</button>
+      <button class="btn-secondary" id="downloadPrompt">Download Prompt</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const sigmoid = x => 1/(1+Math.exp(-x));
+  const clamp01 = x => Math.max(0, Math.min(1, x));
+
+  function computeMAAT({H,B,S,V,R,deltaE,eps,alpha}) {
+    // normalize 0..10 -> 0..1
+    const h=H/10, b=B/10, s=S/10, v=V/10, r=R/10;
+    const core = (h*b*s*v*r) / (deltaE + eps);
+    return 10 * sigmoid(alpha * Math.log(1 + core));
+  }
+
+  function computeESG({E,ES,G,wE,wES,wG}) {
+    const wsum = (wE + wES + wG) || 1;
+    return (wE*E + wES*ES + wG*G) / wsum;
+  }
+
+  function classifyImpact(x) {
+    if (x >= 8.5) return {label:"High Ethical Impact", cls:"good"};
+    if (x >= 6.5) return {label:"Moderate Ethical Impact", cls:"ok"};
+    return {label:"Low Ethical Impact", cls:"bad"};
+  }
+
+  function buildJSON(params, maat, esg, impact) {
+    const obj = {
+      meta: {
+        doi: "10.5281/zenodo.17387301",
+        model: "MAAT–ESG Ethical Impact v1.1.0",
+        alpha: params.alpha,
+        deltaE: params.deltaE,
+        eps: params.eps,
+        beta: params.beta
+      },
+      project: params.summary,
+      MAAT: { H:params.H, B:params.B, S:params.S, V:params.V, R:params.R, score: round2(maat) },
+      ESG:  { E:params.E, S:params.ES, G:params.G, weights:{wE:params.wE,wS:params.wES,wG:params.wG}, score: round2(esg) },
+      EthicalImpact: round2(impact),
+      recommendations: [
+        "Increase Balance (B) by addressing stakeholder asymmetries.",
+        "Strengthen Respect (R) through privacy-by-design and auditability.",
+        "Lower ΔE by removing ambiguity in process and governance."
+      ]
+    };
+    return JSON.stringify(obj, null, 2);
+  }
+
+  function buildPrompt(params, maat, esg, impact) {
+    return `Analyze the following project using the MAAT–ESG Ethical Impact Framework.
+
+Project Summary:
+${params.summary || "[Insert description here]"}
+
+Instructions:
+1) Score MAAT (0–10 each): Harmony (H), Balance (B), Creativity (S), Connectedness (V), Respect (R).
+   Use: MAAT = 10 · σ(α · ln(1 + (H·B·S·V·R)/(ΔE + ε))).
+   Current params: α=${params.alpha}, ΔE=${params.deltaE}, ε=${params.eps}.
+2) Score ESG (0–10 each): Environment (E), Social (S), Governance (G).
+   Weighted average with wE=${params.wE}, wS=${params.wES}, wG=${params.wG}.
+3) Compute Ethical Impact = β · MAAT + (1 – β) · ESG with β=${params.beta}.
+4) Return structured JSON:
+{
+  "MAAT":{"H":h,"B":b,"S":s,"V":v,"R":r,"score":m},
+  "ESG":{"E":e,"S":s2,"G":g,"score":z},
+  "EthicalImpact": i,
+  "Recommendations":["..."]
+}
+5) Provide a short improvement plan (≤120 words).
+
+Current quick scores (for reference):
+- MAAT ≈ ${round2(maat)}
+- ESG  ≈ ${round2(esg)}
+- Ethical Impact ≈ ${round2(impact)}`;
+  }
+
+  function round2(x){ return Math.round(x*100)/100 }
+
+  function collect() {
+    return {
+      summary: $("summary").value.trim(),
+      H: parseFloat($("H").value || 0),
+      B: parseFloat($("B").value || 0),
+      S: parseFloat($("S").value || 0),
+      V: parseFloat($("V").value || 0),
+      R: parseFloat($("R").value || 0),
+      deltaE: parseFloat($("deltaE").value || 0.11),
+      eps: parseFloat($("eps").value || 0.01),
+      alpha: parseFloat($("alpha").value || 1.0),
+      E: parseFloat($("E").value || 0),
+      ES: parseFloat($("ES").value || 0),
+      G: parseFloat($("G").value || 0),
+      wE: parseFloat($("wE").value || 1.0),
+      wES: parseFloat($("wES").value || 1.0),
+      wG: parseFloat($("wG").value || 1.0),
+      beta: parseFloat($("beta").value || 0.6)
+    };
+  }
+
+  function update() {
+    const p = collect();
+    const maat = computeMAAT(p);
+    const esg  = computeESG(p);
+    const impact = p.beta*maat + (1-p.beta)*esg;
+
+    // meters
+    $("maatVal").textContent = "MAAT " + round2(maat);
+    $("maatBar").style.width = Math.max(0, Math.min(10, maat))*10 + "%";
+
+    $("esgVal").textContent = "ESG " + round2(esg);
+    $("esgBar").style.width = Math.max(0, Math.min(10, esg))*10 + "%";
+
+    $("impactVal").textContent = "Impact " + round2(impact);
+    $("impactBar").style.width = Math.max(0, Math.min(10, impact))*10 + "%";
+
+    const c = classifyImpact(impact);
+    $("impactClass").textContent = c.label;
+    $("impactClass").className = "pill " + c.cls;
+
+    // json
+    $("jsonOut").textContent = buildJSON(p, maat, esg, impact);
+    // prompt
+    $("promptOut").textContent = buildPrompt(p, maat, esg, impact);
+  }
+
+  function download(text, fname){
+    const blob = new Blob([text], {type:"text/plain"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = fname;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  async function copySel(id){
+    try{
+      await navigator.clipboard.writeText($(id).textContent);
+      alert("Copied to clipboard.");
+    }catch(e){
+      alert("Copy failed, select manually.");
+    }
+  }
+
+  // events
+  for(const id of ["summary","H","B","S","V","R","deltaE","eps","alpha","E","ES","G","wE","wES","wG","beta"]){
+    $(id).addEventListener("input", update);
+  }
+  $("copyJson").addEventListener("click", ()=>copySel("jsonOut"));
+  $("downloadJson").addEventListener("click", ()=>download($("jsonOut").textContent,"maat_esg_output.json"));
+  $("copyPrompt").addEventListener("click", ()=>copySel("promptOut"));
+  $("downloadPrompt").addEventListener("click", ()=>download($("promptOut").textContent,"maat_esg_prompt.txt"));
+
+  update(); // init render
+</script>
+</body>
+</html>

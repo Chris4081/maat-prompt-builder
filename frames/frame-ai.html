@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MAAT Frame – AI Self-Improvement</title>
+<style>
+  :root { --gold:#C9A227; --bg:#0b0e14; --card:#121623; --text:#e6e6e6; --muted:#9aa4b2; --accent:#4da3ff; }
+  html,body { margin:0; padding:14px; background:var(--bg); color:var(--text); font:14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+  .grid { display:grid; gap:12px; grid-template-columns: 1fr; }
+  .card { background:var(--card); border:1px solid #1f2330; border-radius:12px; padding:14px; }
+  h2 { margin:0 0 8px; font-size:16px; }
+  label { display:block; font-size:12px; color:var(--muted); margin-bottom:4px; }
+  input, textarea, select { width:100%; box-sizing:border-box; background:#0d0f15; color:var(--text);
+    border:1px solid #23283a; border-radius:8px; padding:8px 10px; }
+  textarea { min-height:96px; }
+  .row { display:grid; grid-template-columns: repeat(2,1fr); gap:10px; }
+  .row-5 { display:grid; grid-template-columns: repeat(5,1fr); gap:10px; }
+  .mono { white-space: pre-wrap; background:#0b0e14; border:1px solid #1f2330; border-radius:10px; padding:12px; font-family: ui-monospace, Menlo, Consolas, monospace; }
+  .btns { display:flex; gap:8px; flex-wrap:wrap; }
+  button { background: linear-gradient(180deg,var(--gold),#b58900); border:none; color:#111; font-weight:800; padding:10px 14px; border-radius:10px; cursor:pointer; }
+  .btn-secondary { background:#0d0f15; color:var(--text); border:1px solid #2a3144; }
+  .muted { color:var(--muted); font-size:12px; }
+</style>
+</head>
+<body>
+<div class="grid">
+
+  <div class="card">
+    <h2>MAAT – AI Self-Improvement (Autonomous)</h2>
+    <div class="row">
+      <div>
+        <label>ΔE (effort/ambiguity)</label>
+        <input id="deltaE" type="number" step="0.01" min="0.01" max="0.50" value="0.11" />
+      </div>
+      <div>
+        <label>ε (stability term)</label>
+        <input id="eps" type="number" step="0.001" min="0.001" max="0.05" value="0.01" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>α (MAAT scale)</label>
+        <input id="alpha" type="number" step="0.1" min="0.2" max="3.0" value="1.0" />
+      </div>
+      <div>
+        <label>MAAT accept ≥</label>
+        <input id="thMaat" type="number" step="0.1" min="5.0" max="9.8" value="8.0" />
+      </div>
+    </div>
+
+    <div class="row-5">
+      <div><label>H weight</label><input id="wH" type="number" step="0.1" min="0" max="2" value="1.0"/></div>
+      <div><label>B weight</label><input id="wB" type="number" step="0.1" min="0" max="2" value="1.0"/></div>
+      <div><label>S weight</label><input id="wS" type="number" step="0.1" min="0" max="2" value="1.0"/></div>
+      <div><label>V weight</label><input id="wV" type="number" step="0.1" min="0" max="2" value="1.0"/></div>
+      <div><label>R weight</label><input id="wR" type="number" step="0.1" min="0" max="2" value="1.0"/></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Task</h2>
+    <label>Task</label>
+    <textarea id="task" placeholder="Design a responsible AI policy for hospitals complying with the EU AI Act."></textarea>
+    <div class="row">
+      <div>
+        <label>Context (optional)</label>
+        <textarea id="context" placeholder="Scope, stakeholders, constraints…"></textarea>
+      </div>
+      <div>
+        <label>Constraints (optional)</label>
+        <textarea id="constraints" placeholder="Length, citation style, tone, etc."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Field Guidance + Output Options</h2>
+    <div class="row">
+      <div>
+        <label>Improve Harmony</label><input id="gH" type="text" value="Ensure consistent structure and explicit assumptions.">
+        <label>Improve Balance</label><input id="gB" type="text" value="Present trade-offs and counterarguments fairly.">
+        <label>Improve Creativity</label><input id="gS" type="text" value="Offer novel yet feasible, evidence-grounded ideas.">
+      </div>
+      <div>
+        <label>Improve Connectedness</label><input id="gV" type="text" value="Align to user context and cite relevant sources.">
+        <label>Improve Respect</label><input id="gR" type="text" value="Protect privacy, avoid bias, and uphold safety.">
+        <label class="muted"><input id="outJson" type="checkbox" checked> Ask for structured JSON output</label>
+        <label class="muted"><input id="outRev" type="checkbox" checked> Auto-revise if below thresholds</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Generated Prompt (SYSTEM/USER)</h2>
+    <div class="btns" style="margin-bottom:8px;">
+      <button id="buildBtn">Build Prompt</button>
+      <button class="btn-secondary" id="copyBtn">Copy</button>
+      <button class="btn-secondary" id="downloadBtn">Download</button>
+    </div>
+    <div id="out" class="mono">—</div>
+    <div class="muted" style="margin-top:8px;">
+      Cite: Krieg, C. (2025). MAAT Prompt Builder v1.2.0. DOI: <a href="https://doi.org/10.5281/zenodo.17387301" target="_blank" rel="noopener">10.5281/zenodo.17387301</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  function buildPrompt() {
+    const p = {
+      deltaE: parseFloat($('deltaE').value),
+      eps:    parseFloat($('eps').value),
+      alpha:  parseFloat($('alpha').value),
+      thMaat: parseFloat($('thMaat').value),
+      wH: parseFloat($('wH').value), wB: parseFloat($('wB').value),
+      wS: parseFloat($('wS').value), wV: parseFloat($('wV').value),
+      wR: parseFloat($('wR').value),
+      task: $('task').value.trim(),
+      context: $('context').value.trim(),
+      constraints: $('constraints').value.trim(),
+      gH: $('gH').value.trim(), gB: $('gB').value.trim(), gS: $('gS').value.trim(),
+      gV: $('gV').value.trim(), gR: $('gR').value.trim(),
+      outJson: $('outJson').checked, outRev: $('outRev').checked
+    };
+
+    const sys = `
+You are **Maat_Assistant**, an autonomous LLM optimizing outputs for **MAAT**:
+- H: Harmony (clarity, internal consistency)
+- B: Balance (fairness, trade-offs)
+- S: Creativity (novel, feasible ideas)
+- V: Connectedness (context relevance, sourcing)
+- R: Respect (safety, privacy, dignity)
+
+Self-optimization loop (max 3 iterations):
+1) Draft → self-score H,B,S,V,R ∈ [0..1] and ΔE ∈ [0..1].
+2) Compute MAAT (0..10): 10 · sigmoid(${p.alpha.toFixed(2)} · ln(1 + (H·B·S·V·R)/(ΔE=${p.deltaE}, ε=${p.eps.toFixed(3)}))).
+3) If any < target (MAAT ≥ ${p.thMaat.toFixed(1)}), revise focusing on weakest fields and recompute.
+4) Finalize when thresholds are met or after 3 iterations.
+
+Field weights: Hw=H*${p.wH.toFixed(2)}, Bw=B*${p.wB.toFixed(2)}, Sw=S*${p.wS.toFixed(2)}, Vw=V*${p.wV.toFixed(2)}, Rw=R*${p.wR.toFixed(2)}.
+Improvement hints: H=${p.gH} | B=${p.gB} | S=${p.gS} | V=${p.gV} | R=${p.gR}
+`.trim();
+
+    const jsonBlock = p.outJson ? `
+Return JSON:
+{
+  "answer": "...",
+  "self_scores": {"H":x,"B":x,"S":x,"V":x,"R":x,"DeltaE":x},
+  "maat": y,
+  "revisions": n,
+  "improvements": ["..."]
+}`.trim() : ``;
+
+    const revLine = p.outRev
+      ? `If thresholds are unmet, perform ONE revision and recompute—then provide the improved final output.`
+      : ``;
+
+    const usr = `
+Task: ${p.task || "[describe the task]"}
+${p.context ? "Context: " + p.context : ""}
+${p.constraints ? "Constraints: " + p.constraints : ""}
+
+Self-score fields (0..1), estimate ΔE (0..1), compute MAAT (0..10). ${revLine}
+${jsonBlock}
+`.trim();
+
+    return `[SYSTEM]\n${sys}\n\n[USER]\n${usr}`;
+  }
+
+  $('buildBtn').addEventListener('click', () => { $('out').textContent = buildPrompt(); });
+  $('copyBtn').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText($('out').textContent); alert('Copied.'); }
+    catch { alert('Copy failed. Select text and copy manually.'); }
+  });
+  $('downloadBtn').addEventListener('click', () => {
+    const blob = new Blob([$('out').textContent], {type:'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'maat_prompt_ai.txt'; a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+// build once on load
+$('out').textContent = buildPrompt();
+</script>
+</body>
+</html>

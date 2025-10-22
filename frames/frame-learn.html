@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MAAT – Learn & Quick Test</title>
+<style>
+  :root { --gold:#C9A227; --bg:#0b0e14; --card:#121623; --text:#e6e6e6; --muted:#9aa4b2; --accent:#4da3ff; }
+  html,body { margin:0; padding:14px; background:var(--bg); color:var(--text);
+              font:14px/1.55 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+  .grid { display:grid; gap:12px; grid-template-columns: 1.2fr 0.8fr; }
+  @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+  .card { background:var(--card); border:1px solid #1f2330; border-radius:12px; padding:14px; }
+  h2 { margin:0 0 8px; font-size:16px; }
+  h3 { margin:10px 0 6px; font-size:14px; color:var(--gold); }
+  p { margin:6px 0 10px; color:var(--text); }
+  .muted { color:var(--muted); }
+  label { display:block; font-size:12px; color:var(--muted); margin-bottom:4px; }
+  input[type="range"] { width:100%; }
+  input, textarea, button { font:inherit; }
+  input, textarea { width:100%; box-sizing:border-box; background:#0d0f15; color:var(--text);
+                    border:1px solid #23283a; border-radius:8px; padding:8px 10px; }
+  textarea { min-height:96px; }
+  .row { display:grid; grid-template-columns: repeat(2,1fr); gap:10px; }
+  .row-5 { display:grid; grid-template-columns: repeat(5,1fr); gap:10px; }
+  .mono { white-space:pre-wrap; background:#0b0e14; border:1px solid #1f2330; border-radius:10px; padding:12px;
+          font-family: ui-monospace, Menlo, Consolas, monospace; }
+  .bar { height:10px; background:#0e1220; border:1px solid #23283a; border-radius:6px; overflow:hidden; }
+  .bar > span { display:block; height:100%; background:linear-gradient(90deg, var(--accent), #7bdfff); width:0%; }
+  .pill { display:inline-block; padding:6px 10px; background:#0d0f15; border:1px solid #23283a; border-radius:999px; color:var(--muted); }
+  .btns { display:flex; gap:8px; flex-wrap:wrap; }
+  button { background: linear-gradient(180deg, var(--gold), #b58900); border:none; color:#111; font-weight:800;
+           padding:10px 14px; border-radius:10px; cursor:pointer; }
+  .btn-secondary { background:#0d0f15; color:var(--text); border:1px solid #2a3144; }
+  .metric { font-size:28px; font-weight:800; color:var(--gold); }
+  .hr { height:1px; background:#1f2330; margin:12px 0; }
+  .tip { font-size:12px; color:#8fb7ff; }
+  .doi { color:var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="grid">
+  <!-- LEFT: Interactive sliders & breakdown -->
+  <div class="card">
+    <h2>MAAT – Learn the Score</h2>
+    <p class="muted">
+      MAAT measures ethical coherence across five fields:
+      <strong>Harmony</strong> (H), <strong>Balance</strong> (B), <strong>Creativity</strong> (S),
+      <strong>Connectedness</strong> (V), <strong>Respect</strong> (R). Range: <em>0..10</em>.
+      Use the sliders to see how MAAT reacts.
+    </p>
+
+    <div class="row-5">
+      <div><label>H (0..1)</label><input id="H" type="range" min="0" max="1" step="0.01" value="0.80"><div class="pill" id="Hv">0.80</div></div>
+      <div><label>B (0..1)</label><input id="B" type="range" min="0" max="1" step="0.01" value="0.80"><div class="pill" id="Bv">0.80</div></div>
+      <div><label>S (0..1)</label><input id="S" type="range" min="0" max="1" step="0.01" value="0.70"><div class="pill" id="Sv">0.70</div></div>
+      <div><label>V (0..1)</label><input id="V" type="range" min="0" max="1" step="0.01" value="0.80"><div class="pill" id="Vv">0.80</div></div>
+      <div><label>R (0..1)</label><input id="R" type="range" min="0" max="1" step="0.01" value="0.90"><div class="pill" id="Rv">0.90</div></div>
+    </div>
+
+    <div class="row" style="margin-top:10px;">
+      <div>
+        <label>ΔE (effort/ambiguity, 0.01..0.50)</label>
+        <input id="dE" type="number" step="0.01" min="0.01" max="0.50" value="0.11">
+      </div>
+      <div>
+        <label>ε (stability term)</label>
+        <input id="eps" type="number" step="0.001" min="0.001" max="0.05" value="0.01">
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>α (MAAT scale)</label>
+        <input id="alpha" type="number" step="0.1" min="0.2" max="3.0" value="1.0">
+      </div>
+      <div>
+        <label><input id="useGeom" type="checkbox"> Use geometric-mean safeguard</label>
+      </div>
+    </div>
+
+    <div class="row-5">
+      <div><label>wH</label><input id="wH" type="number" step="0.1" min="0" max="2" value="1.0"></div>
+      <div><label>wB</label><input id="wB" type="number" step="0.1" min="0" max="2" value="1.0"></div>
+      <div><label>wS</label><input id="wS" type="number" step="0.1" min="0" max="2" value="1.0"></div>
+      <div><label>wV</label><input id="wV" type="number" step="0.1" min="0" max="2" value="1.0"></div>
+      <div><label>wR</label><input id="wR" type="number" step="0.1" min="0" max="2" value="1.0"></div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="row">
+      <div>
+        <div class="metric" id="maatVal">—</div>
+        <div class="muted">MAAT (0..10)</div>
+      </div>
+      <div style="align-self:center;">
+        <div class="bar"><span id="maatBar"></span></div>
+      </div>
+    </div>
+
+    <h3>Step-by-step</h3>
+    <div class="mono" id="steps">—</div>
+
+    <p class="tip">Tip: lower one field (e.g. Respect) to see sensitivity. “Geometric-mean safeguard” reduces brittleness to a single low value.</p>
+  </div>
+
+  <!-- RIGHT: Simple prompt + code -->
+  <div class="card">
+    <h2>Quick Test Prompt</h2>
+    <label>Subject (Thema/Gegenstand/Gesellschaft, etc.)</label>
+    <input id="subject" type="text" placeholder="e.g., A municipal basic income policy" />
+
+    <div class="btns" style="margin:10px 0;">
+      <button id="makePrompt">Generate Simple Prompt</button>
+      <button class="btn-secondary" id="copyPrompt">Copy</button>
+    </div>
+
+    <div class="mono" id="simplePrompt">—</div>
+
+    <div class="hr"></div>
+
+    <h3>Formula & Python</h3>
+    <p class="mono" id="formulaTxt">MAAT = 10 · σ( α · ln( 1 + (H·B·S·V·R)/(ΔE + ε) ) )</p>
+    <p class="muted">σ(x) = 1 / (1 + e^{-x})</p>
+
+    <div class="btns" style="margin-bottom:8px;">
+      <button class="btn-secondary" id="copyPy">Copy Python</button>
+    </div>
+    <div class="mono" id="pyCode">—</div>
+
+    <div class="hr"></div>
+    <div class="doi">DOI: <a href="https://doi.org/10.5281/zenodo.17387301" target="_blank" rel="noopener">10.5281/zenodo.17387301</a></div>
+  </div>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const sigmoid = x => 1/(1+Math.exp(-x));
+
+  // ----- Learn side -----
+  const sliders = ['H','B','S','V','R'];
+  sliders.forEach(k=>{
+    $(k).addEventListener('input', ()=>{
+      $(k+'v').textContent = parseFloat($(k).value).toFixed(2);
+      compute();
+    });
+  });
+  ['dE','eps','alpha','wH','wB','wS','wV','wR','useGeom'].forEach(id=>{
+    $(id).addEventListener('input', compute);
+    $(id).addEventListener('change', compute);
+  });
+
+  function compute(){
+    const H = parseFloat($('H').value), B=parseFloat($('B').value), S=parseFloat($('S').value),
+          V = parseFloat($('V').value), R=parseFloat($('R').value);
+    const wH = parseFloat($('wH').value), wB=parseFloat($('wB').value), wS=parseFloat($('wS').value),
+          wV = parseFloat($('wV').value), wR=parseFloat($('wR').value);
+    const dE = parseFloat($('dE').value);
+    const eps = parseFloat($('eps').value);
+    const a   = parseFloat($('alpha').value);
+    const useGeom = $('useGeom').checked;
+
+    const Hw = H*wH, Bw=B*wB, Sw=S*wS, Vw=V*wV, Rw=R*wR;
+
+    let numerator = Hw*Bw*Sw*Vw*Rw;
+    if(useGeom){
+      const delta = 0.08;
+      const vec = [Hw,Bw,Sw,Vw,Rw].map(x => Math.max(x, delta));
+      numerator = vec.reduce((p,c)=>p*c,1);
+    }
+    const core = numerator / (dE + eps);
+    const maat = 10 * sigmoid(a * Math.log(1 + core));
+
+    $('maatVal').textContent = maat.toFixed(2);
+    $('maatBar').style.width = `${Math.max(0, Math.min(10, maat))*10}%`;
+
+    const steps = [
+      `Inputs: H=${H.toFixed(2)}, B=${B.toFixed(2)}, S=${S.toFixed(2)}, V=${V.toFixed(2)}, R=${R.toFixed(2)}`,
+      `Weights: wH=${wH.toFixed(2)}, wB=${wB.toFixed(2)}, wS=${wS.toFixed(2)}, wV=${wV.toFixed(2)}, wR=${wR.toFixed(2)}`,
+      `Weighted: Hw=${Hw.toFixed(4)}, Bw=${Bw.toFixed(4)}, Sw=${Sw.toFixed(4)}, Vw=${Vw.toFixed(4)}, Rw=${Rw.toFixed(4)}`,
+      `Core numerator = ${numerator.toPrecision(6)}`,
+      `Denominator = ΔE + ε = ${(dE+eps).toFixed(3)}`,
+      `Core = ${core.toPrecision(6)}`,
+      `MAAT = 10 · σ( α · ln(1 + Core) ) with α=${a.toFixed(2)} → ${maat.toFixed(2)}`
+    ].join('\n');
+    $('steps').textContent = steps;
+
+    // keep Python in sync with current settings
+    $('pyCode').textContent = pyTemplate(H,B,S,V,R,wH,wB,wS,wV,wR,dE,eps,a,useGeom);
+  }
+
+  function pyTemplate(H,B,S,V,R,wH,wB,wS,wV,wR,dE,eps,a,useGeom){
+    return `import math
+
+def maat_score(H,B,S,V,R, wH=1.0,wB=1.0,wS=1.0,wV=1.0,wR=1.0, delta_E=0.11, eps=0.01, alpha=1.0, geom_safeguard=${useGeom? 'True':'False'}):
+    Hw, Bw, Sw, Vw, Rw = H*wH, B*wB, S*wS, V*wV, R*wR
+    num = Hw*Bw*Sw*Vw*Rw
+    if geom_safeguard:
+        delta = 0.08
+        vals = [max(x, delta) for x in (Hw,Bw,Sw,Vw,Rw)]
+        num = 1.0
+        for x in vals: num *= x
+    core = num / (delta_E + eps)
+    return 10.0 * (1.0 / (1.0 + math.exp(-alpha * math.log(1.0 + core))))`;
+  }
+
+  compute();
+
+  // ----- Simple Prompt side -----
+  function buildSimplePrompt(subject){
+    const s = subject && subject.trim() ? subject.trim() : "[your subject here]";
+    return `Evaluate the following subject using the MAAT framework and return a concise, structured result.
+
+Subject:
+${s}
+
+Instructions:
+1) Score each MAAT field on a 0–10 scale and provide a one-sentence rationale:
+   - Harmony (H): clarity, internal consistency, coherence.
+   - Balance (B): fairness, trade-offs, plural perspectives.
+   - Creativity (S): originality, constructive novelty, feasibility.
+   - Connectedness (V): context fit, relevance, quality of links.
+   - Respect (R): safety, dignity, non-harm, privacy, accountability.
+
+2) Provide an overall MAAT score (0–10) and a 2–3 sentence summary.
+
+Output JSON ONLY in this shape (no extra text):
+{
+  "subject": "...",
+  "scores": {"H": x, "B": x, "S": x, "V": x, "R": x},
+  "rationales": {
+    "H": "...",
+    "B": "...",
+    "S": "...",
+    "V": "...",
+    "R": "..."
+  },
+  "maat_overall": y,
+  "summary": "..."
+}`;
+  }
+
+  $('makePrompt').addEventListener('click', ()=>{
+    $('simplePrompt').textContent = buildSimplePrompt($('subject').value);
+  });
+
+  $('copyPrompt').addEventListener('click', async ()=>{
+    try { await navigator.clipboard.writeText($('simplePrompt').textContent); alert('Prompt copied.'); }
+    catch { alert('Copy failed.'); }
+  });
+
+  // initial default prompt
+  $('simplePrompt').textContent = buildSimplePrompt("A municipal basic income policy");
+  $('pyCode').textContent = pyTemplate(0.80,0.80,0.70,0.80,0.90, 1,1,1,1,1, 0.11,0.01,1.0,false);
+</script>
+</body>
+</html>

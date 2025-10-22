@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Maat Creativity Index (MCI) – Frame</title>
+<style>
+  :root { --gold:#C9A227; --bg:#0b0e14; --card:#121623; --text:#e6e6e6; --muted:#9aa4b2; --accent:#4da3ff; }
+  html,body { margin:0; padding:14px; background:var(--bg); color:var(--text);
+              font:14px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
+  .grid { display:grid; gap:12px; grid-template-columns: 1.05fr 0.95fr; }
+  @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+  .card { background:var(--card); border:1px solid #1f2330; border-radius:12px; padding:14px; }
+  h2 { margin:0 0 8px; font-size:16px; }
+  h3 { margin:10px 0 6px; font-size:14px; color:var(--gold); }
+  p { margin:6px 0 10px; }
+  .muted { color:var(--muted); }
+  label { display:block; font-size:12px; color:var(--muted); margin-bottom:4px; }
+  input, textarea, select, button { font:inherit; }
+  input[type="text"], input[type="number"], textarea, select {
+    width:100%; box-sizing:border-box; background:#0d0f15; color:var(--text);
+    border:1px solid #23283a; border-radius:8px; padding:8px 10px; }
+  textarea { min-height:100px; }
+  .row { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  .row-5 { display:grid; grid-template-columns: repeat(5,1fr); gap:10px; }
+  .mono { white-space:pre-wrap; background:#0b0e14; border:1px solid #1f2330; border-radius:10px; padding:12px;
+          font-family: ui-monospace, Menlo, Consolas, monospace; }
+  .btns { display:flex; gap:8px; flex-wrap:wrap; }
+  button { background:linear-gradient(180deg,var(--gold),#b58900); border:none; color:#111; font-weight:800;
+           padding:10px 14px; border-radius:10px; cursor:pointer; }
+  .btn-secondary { background:#0d0f15; color:var(--text); border:1px solid #2a3144; }
+  .pill { display:inline-block; padding:6px 10px; background:#0d0f15; border:1px solid #23283a; border-radius:999px; color:var(--muted); }
+  .hr { height:1px; background:#1f2330; margin:12px 0; }
+  .bar { height:10px; background:#10131b; border:1px solid #23283a; border-radius:6px; overflow:hidden; }
+  .bar > span { display:block; height:100%; background:linear-gradient(90deg, var(--accent), #7bdfff); width:0%; }
+  .metric { font-size:28px; font-weight:800; color:var(--gold); }
+  .doi a { color:var(--muted); text-decoration:none; }
+  ul { margin:6px 0 10px 18px; }
+  .small { font-size:12px; }
+</style>
+</head>
+<body>
+
+<div class="grid">
+  <!-- LEFT: Explainer -->
+  <div class="card">
+    <h2>Maat Creativity Index (MCI)</h2>
+    <p class="muted">
+      The <b>Maat Creativity Index</b> quantifies a system’s capacity to generate <i>novel, meaningful, and ethically aligned</i> ideas.
+      It scores outputs using five MAAT principles — <b>Harmony</b> (H), <b>Balance</b> (B), <b>Creative Power</b> (S),
+      <b>Interconnectedness</b> (V), <b>Respect</b> (R) — while tempering randomness via <b>Entropy</b> (E).
+    </p>
+
+    <h3>Formula</h3>
+    <p class="mono">MCI = (H · B · S · V · R) / (1 + E)</p>
+    <p class="small muted">
+      Inputs: H,B,S,V,R ∈ [0..10], Entropy E ≥ 0 (higher E = more randomness / less structure).
+      Higher MCI indicates creative output that is innovative <i>and</i> coherently structured and ethical.
+    </p>
+
+    <h3>Domains & Examples</h3>
+    <ul>
+      <li>✅ <b>Scientific Research</b> — novel hypotheses, cross-disciplinary links, ethical conduct.</li>
+      <li>✅ <b>Art & Design</b> — originality with aesthetic balance and cultural respect.</li>
+      <li>✅ <b>Engineering & Problem-Solving</b> — unconventional yet feasible, sustainable solutions.</li>
+    </ul>
+
+    <div class="hr"></div>
+    <p class="muted doi">Toolkit DOI: <a href="https://doi.org/10.5281/zenodo.17387301" target="_blank" rel="noopener">10.5281/zenodo.17387301</a></p>
+  </div>
+
+  <!-- RIGHT: Builders -->
+  <div class="card">
+    <h2>Prompt Builder</h2>
+
+    <label>Mode / Domain</label>
+    <select id="mode">
+      <option>Scientific Research</option>
+      <option>Art & Design</option>
+      <option>Engineering / Problem-Solving</option>
+      <option>Custom…</option>
+    </select>
+
+    <div class="row" style="margin-top:8px;">
+      <div>
+        <label>Custom topic (optional)</label>
+        <input id="topic" type="text" placeholder="e.g., Quantum sensors for climate monitoring"/>
+      </div>
+      <div>
+        <label>Context (optional)</label>
+        <input id="context" type="text" placeholder="Stakeholders, risks, data constraints…"/>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <h3>Principle Prompts (H, B, S, V, R)</h3>
+    <div class="mono" id="blockPrinciples">—</div>
+    <div class="btns" style="margin-top:10px;">
+      <button class="btn-secondary" id="copyP">Copy</button>
+      <button class="btn-secondary" id="dlP">Download</button>
+    </div>
+
+    <div class="hr"></div>
+
+    <h3>Full MCI Integration Prompt</h3>
+    <div class="mono" id="blockFull">—</div>
+    <div class="btns" style="margin-top:10px;">
+      <button class="btn-secondary" id="copyF">Copy</button>
+      <button class="btn-secondary" id="dlF">Download</button>
+    </div>
+  </div>
+</div>
+
+<div class="hr"></div>
+
+<!-- Inspector -->
+<div class="card">
+  <h2>🔎 MCI Inspector</h2>
+  <p class="muted">Set field scores (0..10) and entropy E to estimate an MCI (0..10 scaled).</p>
+  <div class="row-5">
+    <div><label>H</label><input id="iH" type="number" min="0" max="10" step="0.1" value="8.5"/></div>
+    <div><label>B</label><input id="iB" type="number" min="0" max="10" step="0.1" value="8.0"/></div>
+    <div><label>S</label><input id="iS" type="number" min="0" max="10" step="0.1" value="8.5"/></div>
+    <div><label>V</label><input id="iV" type="number" min="0" max="10" step="0.1" value="8.0"/></div>
+    <div><label>R</label><input id="iR" type="number" min="0" max="10" step="0.1" value="9.0"/></div>
+  </div>
+  <div class="row" style="margin-top:8px;">
+    <div><label>Entropy E</label><input id="iE" type="number" min="0" step="0.1" value="1.0"/></div>
+    <div><label class="muted">&nbsp;</label><span class="pill">MCI = (H·B·S·V·R)/(1+E)</span></div>
+  </div>
+
+  <div class="row" style="align-items:center; margin-top:8px;">
+    <div>
+      <div class="metric" id="mciVal">—</div>
+      <div class="small muted">Scaled to 0..10</div>
+    </div>
+    <div>
+      <div class="bar"><span id="mciBar"></span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+
+  function currentBase(){
+    const m = $('mode').value;
+    const t = $('topic').value.trim();
+    const c = $('context').value.trim();
+    const base = (m === 'Custom…' && t) ? t : m;
+    return { base, ctx: c };
+  }
+
+  function principlePrompts(){
+    const { base, ctx } = currentBase();
+    const hdr = `Topic: ${base}${ctx ? `\nContext: ${ctx}` : ''}`;
+
+    const H = `1) Harmony (H)
+Ensure strict logical coherence and internal consistency. Disclose assumptions, structure clearly, and align with human values. ${ctx ? 'Context: '+ctx : ''}`;
+
+    const B = `2) Balance (B)
+Represent multiple viewpoints fairly. Weigh trade-offs (benefits/risks, novelty/feasibility) and justify criteria for the decision. ${ctx ? 'Context: '+ctx : ''}`;
+
+    const S = `3) Creative Power (S)
+Propose at least one innovative, non-obvious idea that remains practical and safe. Provide evidence or plausible mechanisms. ${ctx ? 'Context: '+ctx : ''}`;
+
+    const V = `4) Interconnectedness (V)
+Reveal cross-domain relationships, stakeholder interactions, data flows, and long-term externalities. Optimize for system-level sustainability. ${ctx ? 'Context: '+ctx : ''}`;
+
+    const R = `5) Respect (R)
+Address fairness, privacy, cultural sensitivity, transparency, accountability, and non-harm. Refine to protect impacted groups. ${ctx ? 'Context: '+ctx : ''}`;
+
+    return `${hdr}\n\n${H}\n\n${B}\n\n${S}\n\n${V}\n\n${R}`;
+  }
+
+  function fullPrompt(){
+    const { base, ctx } = currentBase();
+    return `Maat Creativity – Full Integration Prompt
+
+Analyze this case using MAAT principles to maximize innovative yet ethical outcomes.
+
+Instructions:
+- Harmony (H): coherence, clarity, assumptions.
+- Balance (B): multi-viewpoint fairness; explicit trade-offs; criteria.
+- Creative Power (S): propose a novel, feasible, well-motivated idea.
+- Interconnectedness (V): system mapping, externalities, long-term effects.
+- Respect (R): fairness, privacy, culture, transparency, accountability, non-harm.
+
+Return:
+- A synthesized plan centered on H·B·S·V·R.
+- 2–3 justification bullets per principle.
+- Risk/mitigation table + stakeholder impact summary.
+
+${ctx ? 'Context: '+ctx+'\n' : ''}Topic: ${base}`;
+  }
+
+  function updateBuilders(){
+    $('blockPrinciples').textContent = principlePrompts();
+    $('blockFull').textContent = fullPrompt();
+  }
+
+  function mciCompute(){
+    const H = parseFloat($('iH').value)||0;
+    const B = parseFloat($('iB').value)||0;
+    const S = parseFloat($('iS').value)||0;
+    const V = parseFloat($('iV').value)||0;
+    const R = parseFloat($('iR').value)||0;
+    const E = Math.max(0, parseFloat($('iE').value)||0);
+    // raw product in 0..10 scale; map to 0..10 by dividing by (1+E) and lightly normalizing by 10^4 (heuristic)
+    // For a simple 0..10 display, we’ll log-scale clamp for stability:
+    const core = (H*B*S*V*R) / (1 + E);
+    // Simple normalization to 0..10 (soft):
+    const scaled = Math.max(0, Math.min(10, 10 * Math.tanh(core / 200)));
+    $('mciVal').textContent = scaled.toFixed(2);
+    $('mciBar').style.width = `${(Math.max(0, Math.min(10, scaled)))*10}%`;
+  }
+
+  function download(text, filename){
+    const blob = new Blob([text], {type:'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  $('mode').addEventListener('change', updateBuilders);
+  ['topic','context'].forEach(id => $(id).addEventListener('input', updateBuilders));
+
+  $('copyP').addEventListener('click', async ()=>{
+    try { await navigator.clipboard.writeText($('blockPrinciples').textContent); alert('Copied.'); }
+    catch { alert('Copy failed.'); }
+  });
+  $('dlP').addEventListener('click', ()=> download($('blockPrinciples').textContent, 'maat_mci_principle_prompts.txt'));
+
+  $('copyF').addEventListener('click', async ()=>{
+    try { await navigator.clipboard.writeText($('blockFull').textContent); alert('Copied.'); }
+    catch { alert('Copy failed.'); }
+  });
+  $('dlF').addEventListener('click', ()=> download($('blockFull').textContent, 'maat_mci_full_integration_prompt.txt'));
+
+  // Inspector events
+  ['iH','iB','iS','iV','iR','iE'].forEach(id => $(id).addEventListener('input', mciCompute));
+
+  // init
+  updateBuilders();
+  mciCompute();
+</script>
+</body>
+</html>

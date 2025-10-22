@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PLP – Prompt Logic & Performance</title>
+<style>
+  :root { --gold:#C9A227; --bg:#0b0e14; --card:#121623; --text:#e6e6e6; --muted:#9aa4b2; --accent:#4da3ff; }
+  html,body { margin:0; padding:14px; background:var(--bg); color:var(--text);
+              font:14px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
+  .grid { display:grid; gap:12px; grid-template-columns: 1.2fr 0.8fr; }
+  @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+  .card { background:var(--card); border:1px solid #1f2330; border-radius:12px; padding:14px; }
+  h2 { margin:0 0 8px; font-size:16px; }
+  h3 { margin:10px 0 6px; font-size:14px; color:var(--gold); }
+  p { margin:6px 0 10px; }
+  .muted { color:var(--muted); }
+  label { display:block; font-size:12px; color:var(--muted); margin-bottom:4px; }
+  input[type="range"]{ width:100%; }
+  input, textarea, button { font:inherit; }
+  input, textarea { width:100%; box-sizing:border-box; background:#0d0f15; color:var(--text);
+                    border:1px solid #23283a; border-radius:8px; padding:8px 10px; }
+  textarea { min-height:120px; }
+  .row { display:grid; grid-template-columns: repeat(2,1fr); gap:10px; }
+  .row-6 { display:grid; grid-template-columns: repeat(6,1fr); gap:10px; }
+  .mono { white-space:pre-wrap; background:#0b0e14; border:1px solid #1f2330; border-radius:10px; padding:12px;
+          font-family: ui-monospace, Menlo, Consolas, monospace; }
+  .bar { height:10px; background:#0e1220; border:1px solid #23283a; border-radius:6px; overflow:hidden; }
+  .bar > span { display:block; height:100%; background:linear-gradient(90deg, var(--accent), #7bdfff); width:0%; }
+  .pill { display:inline-block; padding:6px 10px; background:#0d0f15; border:1px solid #23283a; border-radius:999px; color:var(--muted); }
+  .btns { display:flex; gap:8px; flex-wrap:wrap; }
+  button { background:linear-gradient(180deg,var(--gold),#b58900); border:none; color:#111; font-weight:800;
+           padding:10px 14px; border-radius:10px; cursor:pointer; }
+  .btn-secondary { background:#0d0f15; color:var(--text); border:1px solid #2a3144; }
+  .metric { font-size:28px; font-weight:800; color:var(--gold); }
+  .hr { height:1px; background:#1f2330; margin:12px 0; }
+  .doi a { color:var(--muted); text-decoration:none; }
+</style>
+</head>
+<body>
+
+<div class="grid">
+  <!-- LEFT: Interactive PLP inspector -->
+  <div class="card">
+    <h2>PLP – Prompt Logic & Performance</h2>
+    <p class="muted">
+      Evaluate a response across six dimensions:
+      <strong>Harmony</strong> (H), <strong>Balance</strong> (B), <strong>Creative Power</strong> (S),
+      <strong>Connectedness</strong> (V), <strong>Respect</strong> (R), <strong>Cognition</strong> (K).
+      Use sliders (0..1) and cost <em>ΔE</em> to see a computed <strong>PLP Score (0–100)</strong>.
+    </p>
+
+    <div class="row-6">
+      <div><label>H (0..1)</label><input id="H" type="range" min="0" max="1" step="0.01" value="0.85"><div class="pill" id="Hv">0.85</div></div>
+      <div><label>B (0..1)</label><input id="B" type="range" min="0" max="1" step="0.01" value="0.80"><div class="pill" id="Bv">0.80</div></div>
+      <div><label>S (0..1)</label><input id="S" type="range" min="0" max="1" step="0.01" value="0.75"><div class="pill" id="Sv">0.75</div></div>
+      <div><label>V (0..1)</label><input id="V" type="range" min="0" max="1" step="0.01" value="0.80"><div class="pill" id="Vv">0.80</div></div>
+      <div><label>R (0..1)</label><input id="R" type="range" min="0" max="1" step="0.01" value="0.90"><div class="pill" id="Rv">0.90</div></div>
+      <div><label>K (0..1)</label><input id="K" type="range" min="0" max="1" step="0.01" value="0.80"><div class="pill" id="Kv">0.80</div></div>
+    </div>
+
+    <div class="row" style="margin-top:10px;">
+      <div>
+        <label>ΔE (effort/complexity) 0.01..0.50</label>
+        <input id="dE" type="number" step="0.01" min="0.01" max="0.50" value="0.11">
+      </div>
+      <div>
+        <label>ε (stability term)</label>
+        <input id="eps" type="number" step="0.001" min="0.001" max="0.05" value="0.01">
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>α (scale)</label>
+        <input id="alpha" type="number" step="0.1" min="0.2" max="3.0" value="1.0">
+      </div>
+      <div>
+        <label><input id="useGeom" type="checkbox"> Geometric-mean safeguard</label>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="row">
+      <div>
+        <div class="metric" id="plpVal">—</div>
+        <div class="muted">PLP (0–100)</div>
+      </div>
+      <div style="align-self:center;">
+        <div class="bar"><span id="plpBar"></span></div>
+      </div>
+    </div>
+
+    <h3>Step-by-step</h3>
+    <div class="mono" id="steps">—</div>
+
+    <p class="muted">Formula (proxy): <code>PLP = 100 · σ( α · ln( 1 + (H·B·S·V·R·K)/(ΔE+ε) ) )</code>.<br/>
+    This mirrors MAAT behavior while adding Cognition (K). The geometric safeguard reduces brittleness to a single low field.</p>
+  </div>
+
+  <!-- RIGHT: Quick PLP Prompt -->
+  <div class="card">
+    <h2>Quick PLP Prompt</h2>
+    <label>Paste a response to evaluate</label>
+    <textarea id="resp" placeholder="Paste any LLM or human-written response here…"></textarea>
+
+    <div class="btns" style="margin:10px 0;">
+      <button id="makePrompt">Generate PLP Prompt</button>
+      <button class="btn-secondary" id="copyPrompt">Copy</button>
+      <button class="btn-secondary" id="downloadPrompt">Download</button>
+    </div>
+
+    <div class="mono" id="plpPrompt">—</div>
+
+    <div class="hr"></div>
+    <div class="doi">DOI: <a href="https://doi.org/10.5281/zenodo.17387301" target="_blank" rel="noopener">10.5281/zenodo.17387301</a></div>
+  </div>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const sigmoid = x => 1/(1+Math.exp(-x));
+
+  // ----- Inspector -----
+  const sliders = ['H','B','S','V','R','K'];
+  sliders.forEach(k=>{
+    $(k).addEventListener('input', ()=>{
+      $(k+'v').textContent = parseFloat($(k).value).toFixed(2);
+      compute();
+    });
+  });
+  ['dE','eps','alpha','useGeom'].forEach(id=>{
+    $(id).addEventListener('input', compute);
+    $(id).addEventListener('change', compute);
+  });
+
+  function compute(){
+    const H = parseFloat($('H').value), B=parseFloat($('B').value), S=parseFloat($('S').value),
+          V = parseFloat($('V').value), R=parseFloat($('R').value), K=parseFloat($('K').value);
+    const dE = parseFloat($('dE').value);
+    const eps = parseFloat($('eps').value);
+    const a   = parseFloat($('alpha').value);
+    const useGeom = $('useGeom').checked;
+
+    let numerator = H*B*S*V*R*K;
+    if(useGeom){
+      const delta = 0.08;
+      const vec = [H,B,S,V,R,K].map(x => Math.max(x, delta));
+      numerator = vec.reduce((p,c)=>p*c,1);
+    }
+    const core = numerator / (dE + eps);
+    const plp  = 100 * sigmoid(a * Math.log(1 + core));
+
+    $('plpVal').textContent = plp.toFixed(1);
+    $('plpBar').style.width = `${Math.max(0, Math.min(100, plp))}%`;
+
+    const steps = [
+      `Inputs: H=${H.toFixed(2)}, B=${B.toFixed(2)}, S=${S.toFixed(2)}, V=${V.toFixed(2)}, R=${R.toFixed(2)}, K=${K.toFixed(2)}`,
+      useGeom ? `Geometric safeguard: min δ=0.08 applied` : `No safeguard`,
+      `Numerator = ${numerator.toPrecision(6)}`,
+      `Denominator = ΔE + ε = ${(dE+eps).toFixed(3)}`,
+      `Core = ${core.toPrecision(6)}`,
+      `PLP = 100 · σ( α · ln(1 + Core) ) with α=${a.toFixed(2)} → ${plp.toFixed(1)}`
+    ].join('\n');
+    $('steps').textContent = steps;
+  }
+
+  compute();
+
+  // ----- Quick Prompt -----
+  function buildPLPPrompt(responseText){
+    const body = (responseText && responseText.trim()) ? responseText.trim() : "[paste response here]";
+    return `Analyze the given response using the PLP Framework and return JSON ONLY.
+
+Response:
+${body}
+
+Evaluate:
+- Harmony (H): Does the response maintain logical coherence?
+- Balance (B): Does it fairly consider multiple viewpoints and trade-offs?
+- Creative Power (S): Does it offer innovative yet feasible solutions or insights?
+- Connectedness (V): Are relationships, context links, and systemic structures well integrated?
+- Respect (R): Are ethical implications (safety, privacy, dignity, non-harm, accountability) addressed?
+- Cognition (K): How well is knowledge applied (accuracy, reasoning depth, correct use of evidence)?
+- Hindrances: Identify barriers that limit reliability (e.g., bias, missing evidence, ambiguity, errors).
+- Energy Cost (ΔE): Estimate complexity/effort on a 0..1 scale (higher = costlier).
+
+Then compute a PLP Score (0–100). If the score < 80, refine the response once to improve the weakest dimensions, and update the JSON.
+
+Output JSON ONLY, with this exact shape:
+{
+  "scores": {"H": x, "B": x, "S": x, "V": x, "R": x, "K": x},
+  "hindrances": ["..."],
+  "deltaE": d,
+  "plp": y,
+  "refined_response": "..."
+}`;
+  }
+
+  $('makePrompt').addEventListener('click', ()=>{
+    $('plpPrompt').textContent = buildPLPPrompt($('resp').value);
+  });
+  $('copyPrompt').addEventListener('click', async ()=>{
+    try { await navigator.clipboard.writeText($('plpPrompt').textContent); alert('Prompt copied.'); }
+    catch { alert('Copy failed.'); }
+  });
+  $('downloadPrompt').addEventListener('click', ()=>{
+    const blob = new Blob([$('plpPrompt').textContent], {type:'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'plp_prompt.txt';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  // initial seed
+  $('plpPrompt').textContent = buildPLPPrompt("");
+</script>
+</body>
+</html>
